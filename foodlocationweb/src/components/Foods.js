@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import API, { endpoints } from "../configs/API"
 import { Button, ButtonGroup, Card, Col, Container, Row } from "react-bootstrap"
+import Loading from "../layout/Loading"
 
 const Foods = () => {
     const [foods, setFoods] = useState([])
@@ -23,6 +24,9 @@ const Foods = () => {
     const nextPage = () => setPage(current => current + 1)
     const prevPage = () => setPage(current => current - 1)
 
+    if (foods === null)
+        return <Loading />
+
     return (
         <>
         <Container>
@@ -31,7 +35,7 @@ const Foods = () => {
                     return (
                     <Col md={3} xs={12} className="p-1">
                         <Card>
-                            <Card.Img variant="top" src={f.image} />
+                            <Card.Img variant="top" src={f.image} className="object-fit:cover"/>
                             <Card.Body>
                                 <Card.Title>{f.name}</Card.Title>
                                 <Button variant="primary">Xem chi tiết</Button>
