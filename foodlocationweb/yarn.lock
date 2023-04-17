@@ -3108,6 +3108,11 @@ bootstrap-css-only@^4.4.1:
   resolved "https://registry.npmjs.org/bootstrap-css-only/-/bootstrap-css-only-4.4.1.tgz"
   integrity sha512-iBgNli7RnedBFwn6sMTQoAZ8WgIwmX4kF1rckfj+pgro5q/Q0DbLtcpfH60XoFnCXzbEJU/khC/B2EQap89mCg==
 
+bootstrap-icons@^1.10.4:
+  version "1.10.4"
+  resolved "https://registry.npmjs.org/bootstrap-icons/-/bootstrap-icons-1.10.4.tgz"
+  integrity sha512-eI3HyIUmpGKRiRv15FCZccV+2sreGE2NnmH8mtxV/nPOzQVu0sPEj8HhF1MwjJ31IhjF0rgMvtYOX5VqIzcb/A==
+
 bootstrap@^5.1.3, bootstrap@^5.2.3:
   version "5.2.3"
   resolved "https://registry.npmjs.org/bootstrap/-/bootstrap-5.2.3.tgz"
