@@ -31,7 +31,8 @@ const Foods = () => {
         <>
         <Container>
             <Row>
-                {foods.map(f => {
+                {foods.map(f =>
+                {
                     return (
                     <Col md={3} xs={12} className="p-1">
                         <Card>
