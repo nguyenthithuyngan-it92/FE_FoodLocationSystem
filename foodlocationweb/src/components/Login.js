@@ -10,7 +10,7 @@ const Login = () => {
     const [username, setUsername] = useState()
     const [password, setPassword] = useState()
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState([])
+    const [error, setError] = useState()
     const [user, dispatch] = useContext(UserContext)
 
 
@@ -54,15 +54,19 @@ const Login = () => {
                     "type": "login",
                     "payload": user.data
                 })
+                if (res.status === 200)
+                    <Navigate to="/" />
+                else
+                    setError("Hệ thống bị lỗi! Vui lòng quay lại sau")
             } catch (ex) {
-                setError(...error, 'Username hoặc password không chính xác!')
+                setError('Username hoặc password không chính xác!')
             } finally {
                 setLoading(false)
             }
         }
         
         if (username === "" || username === undefined || password === "" || password === undefined) {
-            setError(...error, "username hoac password không được rỗng!")
+            setError("username hoac password không được rỗng!")
         } else {
             setLoading(true)
             process()
@@ -70,6 +74,7 @@ const Login = () => {
     }
     if (user !== null)
         return <Navigate to="/" />
+    
 
     return (
         <>
@@ -77,7 +82,7 @@ const Login = () => {
 
             {error?<div className="alert alert-danger" dangerouslySetInnerHTML={{__html: error}}></div>:""}
 
-            <Form onSubmit={login}>
+            <Form onSubmit={login} className="formLogin">
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label>Tên đăng nhập</Form.Label>
                     <Form.Control type="text" value={username}
