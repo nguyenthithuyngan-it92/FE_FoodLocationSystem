@@ -1,13 +1,14 @@
 import { useContext, useEffect, useState } from 'react'
 import API, { endpoints } from '../configs/API'
 import { Button, Container, Form, Nav, Navbar } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { UserContext } from '../configs/MyContext'
 
 const Header = () => {
     const [tags, setTags] = useState([])
-    
     const [user, dispatch] = useContext(UserContext)
+    const [q, setQ] = useState()
+    const nav = useNavigate()
 
     useEffect(() => {
         const loadTags = async () => {
@@ -17,6 +18,11 @@ const Header = () => {
 
         loadTags()
     }, [])
+
+    const search = (evt) => {
+        evt.preventDefault()
+        nav(`/?q=${q}`)
+    }
 
     const logout = () => {
         dispatch({
@@ -43,24 +49,29 @@ const Header = () => {
         <>
         <Navbar bg="light" expand="lg">
             <Container>
-                <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
+                <Navbar.Brand href="#home">Địa Điểm Ăn Uống</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="me-auto">
-                    <Nav.Link href="/">&#127968; Trang chủ</Nav.Link>
-                    {tags.map(t => <Nav.Link href="#link">{t.name}</Nav.Link>)}
+                    <Link to="/" className="nav-link active">&#127968; Trang chủ</Link>
+                    {tags.map(t => {
+                        let url = `/?tagId=${t.id}`
+                        return <Link key={t.id} className="nav-link" to={url}>{t.name}</Link>
+                    })}
 
                     {userInfo}
                     
                 </Nav>
-                <Form className="d-flex">
+                <Form onSubmit={search} className="d-flex">
                   <Form.Control
                     type="search"
                     placeholder="Tìm kiếm..."
                     className="me-2"
                     aria-label="Search"
+                    value={q}
+                    onChange={evt => setQ(evt.target.value)}
                   />
-                  <Button variant="outline-success">Tìm</Button>
+                  <Button type="submit" variant="outline-success">Tìm</Button>
                 </Form>
                 </Navbar.Collapse>
             </Container>

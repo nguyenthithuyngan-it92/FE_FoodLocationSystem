@@ -33,7 +33,7 @@ const Footer = () => <footer className="page-footer font-small blue pt-4">
     </div>
 
     <div className="footer-copyright text-center py-3">© Thúy Ngân & Kim Ngân:
-        <a href="https://mdbootstrap.com/"> MDBootstrap.com</a>
+        <a href="https://github.com/nguyenthithuyngan-it92/FE_FoodLocationSystem/"> FE_FoodLocationSystem.com</a>
     </div>
 
 </footer>
