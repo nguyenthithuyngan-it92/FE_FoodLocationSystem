@@ -5,6 +5,8 @@ import API, { endpoints } from "../configs/API"
 import InputFormUser from "../layout/InputFormUser"
 import Loading from "../layout/Loading"
 
+import Alert from '@mui/material/Alert';
+
 const RegisterUser = () => {
     const [user, setUser] = useState({
         "firstName": "",
@@ -71,7 +73,7 @@ const RegisterUser = () => {
         <>
             <h1 className="text-center text-success">ĐĂNG KÝ NGƯỜI DÙNG</h1>
 
-            {err?<div className="alert alert-danger" dangerouslySetInnerHTML={{__html: err}}></div>:""}
+            {err?<Alert severity="error">{err}</Alert>:""}
 
             <Form onSubmit={register}>
                 <InputFormUser label="Tên người dùng" type="text" value={user.firstName} controlId="fn"
