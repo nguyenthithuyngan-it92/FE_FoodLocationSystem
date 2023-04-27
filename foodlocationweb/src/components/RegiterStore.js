@@ -5,6 +5,8 @@ import API, { endpoints } from "../configs/API"
 import InputFormUser from "../layout/InputFormUser"
 import Loading from "../layout/Loading"
 
+import Alert from '@mui/material/Alert';
+
 const RegisterStore = () => {
     const [user, setUser] = useState({
         "firstName": "",
@@ -66,7 +68,9 @@ const RegisterStore = () => {
         if (user.username === "" || user.password === "")
             setErr("Username hoặc password phải nhập!")
         else if (user.password !== user.confirmPassword)
-            setErr("Mật khẩu KHÔNG khớp!")
+            setErr("Mật khẩu KHÔNG khớp!")          
+        else if (user.name_store === "")
+            setErr("Phải nhập tên cửa hàng!")
         else {
             setLoading(true)
             process()
@@ -78,7 +82,7 @@ const RegisterStore = () => {
         <>
             <h1 className="text-center text-success">ĐĂNG KÝ CỬA HÀNG</h1>
 
-            {err?<div className="alert alert-danger" dangerouslySetInnerHTML={{__html: err}}></div>:""}
+            {err?<Alert severity="error">{err}</Alert>:""}
 
             <Form onSubmit={registerStore}>
                 <InputFormUser label="Tên người dùng" type="text" value={user.firstName} controlId="fn"
