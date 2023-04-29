@@ -11,7 +11,9 @@ export const endpoints = {
     "login": "/o/token/",
     "current-user": "/users/current-user/",
     "register": "/users/",
-    "register-store": "/users/"
+    "register-store": "/users/",
+
+    "store-management": "/stores/store-management/",
 }
 
 export const authAPI = () => axios.create({

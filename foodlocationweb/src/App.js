@@ -11,6 +11,8 @@ import userReducer from './reducers/UserReducer';
 import Foods from './components/Foods';
 import RegisterUser from './components/RegisterUser';
 import RegisterStore from './components/RegiterStore';
+import StoreManagement from './components/StoreManagement';
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"/>
 
 
 
@@ -28,6 +30,7 @@ function App() {
             <Route path='/login' element={<Login />} /> 
             <Route path='/register' element={<RegisterUser />} /> 
             <Route path='/register-store' element={<RegisterStore />} /> 
+            <Route path="/store-management" element={<StoreManagement/>} />
             <Route path='*' element={<h1>Comming soon...</h1>}></Route>
           </Routes>
         </Container>
