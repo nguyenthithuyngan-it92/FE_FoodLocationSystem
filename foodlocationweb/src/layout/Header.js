@@ -14,12 +14,9 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import Collapse from '@mui/material/Collapse';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import ButtonM from '@mui/material/Button';
 
 
 const Header = () => {
@@ -27,10 +24,19 @@ const Header = () => {
     
     const [user, dispatch] = useContext(UserContext)
 
-    const [open, setOpen] = useState(false);
+    // const [open, setOpen] = useState(false);
 
-    const handleClick = () => {
-        setOpen(!open);
+    // const handleClick = () => {
+    //     setOpen(!open);
+    // };
+
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
     };
 
     useEffect(() => {
@@ -50,53 +56,70 @@ const Header = () => {
 
     let userInfo = (
         <>
-            <List>
-                <ListItemButton onClick={handleClick}>
+            <div>
+                <ButtonM id="basic-button" aria-controls={open ? 'basic-menu' : undefined}
+                    aria-haspopup="true" aria-expanded={open ? 'true' : undefined}
+                    onClick={handleClick}
+                >
                     <AccountCircleIcon fontSize='small' className='m-2' /> Tài khoản
-                    {open ? <ExpandLess /> : <ExpandMore />}
-                </ListItemButton>
-                <Collapse in={open} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                    <Link to="/login" className="nav-link text-success">
-                        <LoginIcon fontSize='small' /> Đăng nhập
-                    </Link>
-                    <Link to="/register" className="nav-link text-danger" >
-                        <PersonAddIcon fontSize='small' /> Đăng ký              
-                    </Link>
-                    <Link to="/register-store" className="nav-link text-primary" sx={{ pl: 4 }}>
-                        <AddBusinessIcon fontSize='small' /> Đăng ký cửa hàng
-                    </Link>
-                    </List>
-                </Collapse>
-            </List>
+                </ButtonM>
+                <Menu id="basic-menu" anchorEl={anchorEl} open={open} onClose={handleClose} 
+                    MenuListProps={{'aria-labelledby': 'basic-button',}}
+                >
+                    <MenuItem onClick={handleClose}>
+                        <Link to="/login" className="nav-link text-success">
+                            <LoginIcon fontSize='small' /> Đăng nhập
+                        </Link>
+                    </MenuItem>
+                    <MenuItem onClick={handleClose}>
+                        <Link to="/register" className="nav-link text-danger" >
+                            <PersonAddIcon fontSize='small' /> Đăng ký              
+                        </Link>
+                    </MenuItem>
+                    <MenuItem onClick={handleClose}>
+                        <Link to="/register-store" className="nav-link text-primary" sx={{ pl: 4 }}>
+                            <AddBusinessIcon fontSize='small' /> Đăng ký cửa hàng
+                        </Link>
+                    </MenuItem>
+                </Menu>
+            </div>
         </>
     )
     if (user !== null)
         userInfo = (
             <>
-                <List sx={{ flexGrow: 0 }} >
-                    <ListItemButton onClick={handleClick} sx={{ p: 0 }}>
+                <div>
+                    <ButtonM id="basic-button" aria-controls={open ? 'basic-menu' : undefined}
+                        aria-haspopup="true" aria-expanded={open ? 'true' : undefined}
+                        onClick={handleClick}
+                    >
                         <Avatar alt={user.username} src={user.image} />
                         {user.user_role===0?
                             <Link to="#" className="nav-link text-info">Xin chào, {user.first_name}</Link>:
                             <Link to="#" className="nav-link text-info">Xin chào, {user.name_store}</Link>}
-                        {open ? <ExpandLess /> : <ExpandMore />}
-                    </ListItemButton>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                        <List component="div" disablePadding>
+                    </ButtonM>
+                    <Menu id="basic-menu" anchorEl={anchorEl} open={open} onClose={handleClose} 
+                        MenuListProps={{'aria-labelledby': 'basic-button',}}
+                    >
+                        <MenuItem onClick={handleClose}>
                         {user.user_role===1?
                             <Link to="/store-management" className="nav-link text-success">
                                 <ManageAccountsIcon fontSize='small' /> Quản lý cửa hàng              
                             </Link> :""}
-                        <Link to="#" className="nav-link text-primary">
-                            <ManageAccountsIcon fontSize='small' /> Quản lý tài khoản              
-                        </Link>
-                        <Link className="nav-link text-danger" onClick={logout}>
-                            <LogoutIcon fontSize='small' /> Đăng xuất
-                        </Link>
-                        </List>
-                    </Collapse>
-                </List>
+                        </MenuItem>
+                        
+                        <MenuItem onClick={handleClose}>
+                            <Link to="#" className="nav-link text-primary">
+                                <ManageAccountsIcon fontSize='small' /> Quản lý tài khoản              
+                            </Link>
+                        </MenuItem>
+                        <MenuItem onClick={handleClose}>
+                            <Link className="nav-link text-danger" onClick={logout}>
+                                <LogoutIcon fontSize='small' /> Đăng xuất
+                            </Link>
+                        </MenuItem>
+                    </Menu>
+                </div>
             </>
         )
 
