@@ -19,9 +19,9 @@ const InfoStore = () => {
       <Card sx={{ display: "flex", margin: "10px" }}>
         <CardMedia
           component="img"
-          sx={{ width: 160, height: 160, objectFit: "cover", margin: "25px" }}
           src={user.image}
           alt={user.username}
+          sx={{ width: 160, height: 160, objectFit: "cover", margin: "25px" }}
         />
         <Box sx={{ display: "flex", flexDirection: "column" }}>
           <CardContent sx={{ flex: "1 0 auto" }}>

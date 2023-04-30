@@ -12,7 +12,7 @@ import TableOrder from "./TableOrder";
 const StoreManagement = () => {
   const [user] = useContext(UserContext);
   const [stores, setStores] = useState(null);
-  const [navActive, setNavActive] = useState();
+  //   const [navActive, setNavActive] = useState();
 
   // load store
   useEffect(() => {
