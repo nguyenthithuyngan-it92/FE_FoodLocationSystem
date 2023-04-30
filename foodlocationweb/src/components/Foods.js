@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import API, { endpoints } from "../configs/API"
 import { Button, ButtonGroup, Card, Col, Container, Row } from "react-bootstrap"
 import Loading from "../layout/Loading"
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 
 const Foods = () => {
     const [foods, setFoods] = useState([])
@@ -47,8 +49,8 @@ const Foods = () => {
                 })}
             </Row>
             <ButtonGroup aria-label="paging" className="p-1">
-                <Button onClick={prevPage} variant="secondary">&#9194;</Button>
-                <Button onClick={nextPage} variant="secondary">&#9193;</Button>
+                <Button onClick={prevPage} variant="secondary"><ArrowBackIosIcon /></Button>
+                <Button onClick={nextPage} variant="secondary"><ArrowForwardIosIcon /></Button>
             </ButtonGroup>
         </Container>
         </>

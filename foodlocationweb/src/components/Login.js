@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom";
 import API, { authAPI, endpoints } from "../configs/API";
 import { UserContext } from "../configs/MyContext";
 import Loading from "../layout/Loading";
-import Alert from '@mui/material/Alert';
+import Alert from "@mui/material/Alert";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -35,7 +35,9 @@ const Login = () => {
         form.append("password", password);
         form.append("grant_type", "password");
         form.append("client_id", "PX1L78DG7sjxUgndorfk2LTH8ye0jOWbcpRON1lI");
-        form.append("client_secret", "e2X37hXDnWDK1i2sNjCocfUqiDD6siUZKbB52xVjZ9yc2jYKE3PTtNvUNvPPukBGbKda5Iq9mU9L5aWiLZ0mkYpEprjJNkL6bkqnO3Rz4LxCrYDdgyE4Hpef1CL6P6IV"
+        form.append(
+          "client_secret",
+          "e2X37hXDnWDK1i2sNjCocfUqiDD6siUZKbB52xVjZ9yc2jYKE3PTtNvUNvPPukBGbKda5Iq9mU9L5aWiLZ0mkYpEprjJNkL6bkqnO3Rz4LxCrYDdgyE4Hpef1CL6P6IV"
         );
 
         let res = await API.post(endpoints["login"], form, {
@@ -63,10 +65,9 @@ const Login = () => {
     //     console.log("validate error");
     //   } else
 
-    if(!username?.trim()  || !password?.trim()){ 
-      setError( "Username hoặc password không được rỗng!");
-    }
-     else {
+    if (!username?.trim() || !password?.trim()) {
+      setError("Username hoặc password không được rỗng!");
+    } else {
       console.log("validate success");
       setLoading(true);
       process();
@@ -83,9 +84,7 @@ const Login = () => {
               <h3 className="fw-bold mb-2 text-uppercase text-center  ">
                 đăng nhập người dùng
               </h3>
-              {error && 
-                <Alert severity="error">{error}</Alert>
-               }
+              {error && <Alert severity="error">{error}</Alert>}
               <Form onSubmit={login} className="mx-auto">
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                   <Form.Label>Tên đăng nhập</Form.Label>
