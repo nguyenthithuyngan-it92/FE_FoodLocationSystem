@@ -14,9 +14,13 @@ export const endpoints = {
   register: "/users/",
   "register-store": "/users/",
 
-  "store-management": "/stores/store-management/",
+  "menu-management": "/stores/menu-management/",
+  "food-management": "/stores/food-management/",
   "menu-store": (storeId) => `/stores/${storeId}/menu-item/`,
   "food-list": (storeId) => `/food-list/${storeId}/get_food_by_store_id/`,
+  "order-store": "/orders/",
+  "order-pending": "/orders/pending-order/",
+  "order-accepted": "/orders/accepted-order/",
 };
 
 export const authAPI = () =>
