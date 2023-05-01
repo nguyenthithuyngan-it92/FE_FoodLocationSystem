@@ -20,7 +20,6 @@ const StoreManagement = () => {
       try {
         let res = await authAPI().get(endpoints["store-management"]);
         setStores(res.data);
-        console.log(res.data);
       } catch (ex) {}
     };
 

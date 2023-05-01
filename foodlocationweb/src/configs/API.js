@@ -4,6 +4,7 @@ import cookie from "react-cookies";
 export const endpoints = {
   tags: "/tags/",
   foods: "/foods/",
+  "food-by-id": (foodId) => `/foods/${foodId}/`,
   stores: "/stores/",
   user: "/users/",
   "menu-items": "/menu-items/",
@@ -15,6 +16,7 @@ export const endpoints = {
 
   "store-management": "/stores/store-management/",
   "menu-store": (storeId) => `/stores/${storeId}/menu-item/`,
+  "food-list": (storeId) => `/food-list/${storeId}/get_food_by_store_id/`,
 };
 
 export const authAPI = () =>
