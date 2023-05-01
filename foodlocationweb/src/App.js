@@ -36,7 +36,10 @@ function App() {
             <Route path="/register" element={<RegisterUser />} />
             <Route path="/register-store" element={<RegisterStore />} />
             <Route path="/store-management" element={<StoreManagement />} />
-            <Route path="/stores/" element={<StoreDetail />} />
+            <Route
+              path="/stores/:storeId/menu/:foodId"
+              element={<StoreDetail />}
+            />
             <Route path="*" element={<h1>Comming soon...</h1>}></Route>
           </Routes>
         </Container>

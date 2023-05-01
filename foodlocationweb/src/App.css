@@ -36,3 +36,28 @@
     transform: rotate(360deg);
   }
 }
+
+.card-food::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.card-food.active::before {
+  background-color: green;
+}
+
+.card-food.unactive::before {
+  background-color: red;
+}
+
+.card-food-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
