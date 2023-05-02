@@ -187,8 +187,6 @@ const StoreManagement = () => {
     setOpen(false);
   };
 
-  //   const [navActive, setNavActive] = useState();
-
   // load store
   useEffect(() => {
     let loadData = async () => {

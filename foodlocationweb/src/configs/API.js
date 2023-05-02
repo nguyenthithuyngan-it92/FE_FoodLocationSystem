@@ -13,6 +13,7 @@ export const endpoints = {
   "current-user": "/users/current-user/",
   register: "/users/",
   "register-store": "/users/",
+  "payment-method": "/paymentmethod/",
 
   "menu-management": "/stores/menu-management/",
   "food-management": "/stores/food-management/",

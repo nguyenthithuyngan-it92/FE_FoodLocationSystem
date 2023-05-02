@@ -1,5 +1,4 @@
 export const isValidTime = (data = {}) => {
-  console.log("data :>", data);
   const { start_time = "", end_time = "" } = data;
   const currentTime = new Date().getTime();
 

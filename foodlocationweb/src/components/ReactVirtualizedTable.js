@@ -14,9 +14,16 @@ import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox";
+import AddBoxIcon from "@mui/icons-material/AddBox";
 import { Button } from "@mui/material";
 
 import { numberWithCommas } from "../utils/converters";
+
+export const ACTION_TYPES = {
+  MINUS: "-",
+  PLUS: "+",
+};
 
 const sample = [
   ["Frozen yoghurt", 159, 6.0, 24, 4.0],
@@ -62,7 +69,7 @@ const columnsDefault = [
   },
 ];
 
-const rowsDefault = Array.from({ length: 200 }, (_, index) => {
+const rowsDefault = Array.from({ length: 1 }, (_, index) => {
   const randomSelection = sample[Math.floor(Math.random() * sample.length)];
   return createData(index, ...randomSelection);
 });
@@ -75,6 +82,7 @@ const VirtuosoTableComponents = {
     <Table
       {...props}
       sx={{ borderCollapse: "separate", tableLayout: "fixed" }}
+      aria-label="caption table"
     />
   ),
   TableHead,
@@ -132,6 +140,43 @@ export default function ReactVirtualizedTable(props) {
     const renderCellByDataKey = (column, dataKey) => {
       if (column.numeric && dataKey !== "order_status") {
         return numberWithCommas(row[column.dataKey]);
+      }
+
+      if (dataKey === "quantity" && column.hasAction) {
+        return (
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              size="small"
+              style={{ minWidth: 50, color: "red" }}
+              onClick={() => {
+                if (typeof column.service === "function") {
+                  column.service(ACTION_TYPES.MINUS, row);
+                }
+              }}
+            >
+              <IndeterminateCheckBoxIcon />
+            </Button>
+            <span>{row[column.dataKey]}</span>
+            <Button
+              size="small"
+              style={{ minWidth: 50, color: "green" }}
+              onClick={() => {
+                if (typeof column.service === "function") {
+                  column.service(ACTION_TYPES.PLUS, row);
+                }
+              }}
+            >
+              <AddBoxIcon />
+            </Button>
+          </div>
+        );
       }
 
       switch (dataKey) {
