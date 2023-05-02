@@ -13,6 +13,7 @@ import RegisterUser from "./components/RegisterUser";
 import RegisterStore from "./components/RegiterStore";
 import StoreManagement from "./components/StoreManagement";
 import StoreDetail from "./components/StoreDetail";
+import CartOrder from "./components/CartOrder";
 <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/icon?family=Material+Icons"
@@ -40,6 +41,7 @@ function App() {
               path="/stores/:storeId/menu/:foodId"
               element={<StoreDetail />}
             />
+            <Route path="/cart" element={<CartOrder />} />
             <Route path="*" element={<h1>Comming soon...</h1>}></Route>
           </Routes>
         </Container>

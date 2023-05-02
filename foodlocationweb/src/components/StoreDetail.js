@@ -1,5 +1,5 @@
 import InfoStore from "../layout/InfoStore";
-import * as React from "react";
+import { useContext, useState, useEffect, Fragment } from "react";
 import Loading from "../layout/Loading";
 import API, { authAPI, endpoints } from "../configs/API";
 import { useParams } from "react-router-dom";
@@ -31,13 +31,45 @@ import Stack from "@mui/material/Stack";
 import FaceIcon from "@mui/icons-material/Face";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import { isValidTime } from "../utils";
+import CustomizedBadges from "./Cart";
+import { Tooltip } from "@mui/material";
+import { UserContext } from "../configs/MyContext";
 
 const StoreDetail = () => {
-  const [menuItem, setMenuItem] = React.useState([]);
-  const [food, setFood] = React.useState({});
+  const [user, dispatch] = useContext(UserContext);
+
+  const [menuItem, setMenuItem] = useState([]);
+  const [countCart, setCountCart] = useState(0);
+  const [listCart, setListCart] = useState([]);
+  const [food, setFood] = useState({});
   const { storeId, foodId } = useParams();
 
-  React.useEffect(() => {
+  useEffect(() => {
+    console.log(listCart);
+    if (user) {
+      const count = [...(listCart || [])].reduce(
+        (accu, currentValue) => accu + currentValue.quantity,
+        0
+      );
+      setCountCart(count);
+    }
+  }, [listCart]);
+
+  useEffect(() => {
+    if (user) {
+      setListCart(JSON.parse(localStorage.getItem(`cart-${user.id}`)));
+    } else {
+      setCountCart(0);
+      setListCart([]);
+    }
+
+    return () => {
+      setCountCart(0);
+      setListCart([]);
+    };
+  }, [user]);
+
+  useEffect(() => {
     let loadMenuItem = async () => {
       let res = await API.get(endpoints["food-list"](storeId));
       if (res.status === 200) {
@@ -49,8 +81,7 @@ const StoreDetail = () => {
     loadMenuItem();
   }, [storeId]);
 
-  console.log("menuItem :>", menuItem);
-  React.useEffect(() => {
+  useEffect(() => {
     let loadFoodDetail = async () => {
       let res = await API.get(endpoints["food-by-id"](foodId));
       if (res.status === 200) {
@@ -60,6 +91,54 @@ const StoreDetail = () => {
 
     loadFoodDetail();
   }, [foodId]);
+
+  const handleAddToCart = (item) => {
+    const key = `cart-${user.id}`;
+    const itemStorage = localStorage.getItem(key);
+    const temp = [
+      {
+        ...item,
+        user_id: user.id,
+        store_id: parseInt(storeId),
+        quantity: 1,
+      },
+    ];
+
+    if (!itemStorage) {
+      localStorage.setItem(key, JSON.stringify(temp));
+      setListCart(temp);
+    } else {
+      const itemParse = JSON.parse(itemStorage);
+      const itemExisted = itemParse.findIndex(
+        (cartItem) => cartItem.id === item.id
+      );
+
+      if (itemExisted === -1) {
+        itemParse.push({
+          ...item,
+          user_id: user.id,
+          store_id: parseInt(storeId),
+          quantity: 1,
+        });
+        localStorage.setItem(key, JSON.stringify(itemParse));
+        setListCart(itemParse);
+      } else {
+        const temp = itemParse.map((cart) => {
+          if (cart.id === item.id) {
+            return {
+              ...cart,
+              quantity: cart.quantity + 1,
+            };
+          }
+
+          return cart;
+        });
+
+        localStorage.setItem(key, JSON.stringify(temp));
+        setListCart(temp);
+      }
+    }
+  };
 
   if (menuItem.length === 0) return <Loading />;
 
@@ -79,7 +158,7 @@ const StoreDetail = () => {
             <ListItemText
               primary={item.name}
               secondary={
-                <React.Fragment>
+                <Fragment>
                   <Typography
                     sx={{ display: "inline" }}
                     component="span"
@@ -100,12 +179,28 @@ const StoreDetail = () => {
                   >
                     {item.description}
                   </Typography>
-                </React.Fragment>
+                </Fragment>
               }
             />
-            <IconButton color="success" aria-label="add to shopping cart">
-              <AddShoppingCartIcon />
-            </IconButton>
+            {!user ? (
+              <Tooltip title="Vui lòng đăng nhập">
+                <IconButton
+                  color="success"
+                  aria-label="add to shopping cart"
+                  style={{ opacity: "0.5", cursor: "not-allowed" }}
+                >
+                  <AddShoppingCartIcon />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <IconButton
+                color="success"
+                aria-label="add to shopping cart"
+                onClick={() => handleAddToCart(item)}
+              >
+                <AddShoppingCartIcon />
+              </IconButton>
+            )}
           </ListItemButton>
           <Divider variant="inset" component="li" />
         </>
@@ -187,6 +282,7 @@ const StoreDetail = () => {
           })}
         </List>
       </div>
+      <CustomizedBadges count={countCart} />
     </>
   );
 };
