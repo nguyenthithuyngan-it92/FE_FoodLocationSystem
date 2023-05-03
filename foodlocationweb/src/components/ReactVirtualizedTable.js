@@ -13,6 +13,7 @@ import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
 import EditIcon from "@mui/icons-material/Edit";
+import RuleIcon from "@mui/icons-material/Rule";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox";
 import AddBoxIcon from "@mui/icons-material/AddBox";
@@ -188,6 +189,18 @@ export default function ReactVirtualizedTable(props) {
         case "action_v1":
           return (
             <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+              <Button
+                size="small"
+                variant="outlined"
+                style={{ minWidth: 50, color: "blue", borderColor: "blue" }}
+                onClick={() => {
+                  if (typeof column.service === "function") {
+                    column.service();
+                  }
+                }}
+              >
+                <RuleIcon />
+              </Button>
               <Button
                 size="small"
                 variant="outlined"

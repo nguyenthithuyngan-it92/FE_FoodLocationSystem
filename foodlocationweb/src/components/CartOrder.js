@@ -13,7 +13,7 @@ import SaveIcon from "@mui/icons-material/Save";
 const FEE = 15000;
 
 const CartOrder = () => {
-  const [user, dispatch] = useContext(UserContext);
+  const [user] = useContext(UserContext);
   const [payment, setPaymethod] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -42,7 +42,7 @@ const CartOrder = () => {
   ];
 
   const handleActionCart = (type, data) => {
-    console.log({ type, data });
+    // console.log({ type, data });
     const key = `cart-${user.id}`;
     const dataStorage = JSON.parse(localStorage.getItem(key));
     const cartItem = dataStorage.find((item) => item.id === data.id);
@@ -69,7 +69,7 @@ const CartOrder = () => {
   };
 
   useEffect(() => {
-    console.log(listCart);
+    // console.log(listCart);
     if (user) {
       const total = [...(listCart || [])].reduce(
         (accu, currentValue) =>
@@ -170,82 +170,88 @@ const CartOrder = () => {
       <Divider color="gray" />
       <div style={{ border: "1px solid", margin: 10, borderRadius: 5 }}>
         <h6 style={{ margin: 10, color: "gray" }}>Thông tin giao hàng</h6>
-        <div style={{ margin: 10 }}>
-          <InputFormUser
-            label="Tên người nhận"
-            type="text"
-            value={formOrder.receiver_name}
-            controlId="rn"
-            setValue={(e) => {
-              console.log("e", e.target.value);
-              setFormOrder({
-                ...formOrder,
-                receiver_name: e.target.value,
-              });
-            }}
-          />
-          <InputFormUser
-            label="Số điện thoại người nhận"
-            type="number"
-            value={formOrder.receiver_phone}
-            controlId="phone"
-            setValue={(e) => {
-              setFormOrder({
-                ...formOrder,
-                receiver_phone: e.target.value,
-              });
-            }}
-          />
-          <InputFormUser
-            label="Địa chỉ nhận hàng"
-            type="text"
-            value={formOrder.receiver_address}
-            controlId="address"
-            setValue={(e) => {
-              setFormOrder({
-                ...formOrder,
-                receiver_address: e.target.value,
-              });
-            }}
-          />
-          <InputFormUser
-            disabled
-            label="Phí giao hàng"
-            type="number"
-            value={FEE}
-            controlId="fee"
-          />
-          <FormControl fullWidth>
-            <FormLabel>Phương thức thanh toán</FormLabel>
-            <Select
-              onChange={(e) => {
+        <div style={{ margin: 10, display: "flex" }}>
+          <div style={{ width: "50%", margin: 10 }}>
+            <InputFormUser
+              label="Tên người nhận"
+              type="text"
+              value={formOrder.receiver_name}
+              controlId="rn"
+              setValue={(e) => {
                 setFormOrder({
                   ...formOrder,
-                  paymentmethod: e.target.value,
+                  receiver_name: e.target.value,
                 });
               }}
-              value={formOrder.paymentmethod}
-              displayEmpty
-              style={{ height: 37 }}
+            />
+            <InputFormUser
+              label="Số điện thoại người nhận"
+              type="number"
+              value={formOrder.receiver_phone}
+              controlId="phone"
+              setValue={(e) => {
+                setFormOrder({
+                  ...formOrder,
+                  receiver_phone: e.target.value,
+                });
+              }}
+            />
+            <InputFormUser
+              label="Địa chỉ nhận hàng"
+              type="text"
+              value={formOrder.receiver_address}
+              controlId="address"
+              setValue={(e) => {
+                setFormOrder({
+                  ...formOrder,
+                  receiver_address: e.target.value,
+                });
+              }}
+            />
+          </div>
+          <div style={{ width: "50%", margin: 10 }}>
+            <InputFormUser
+              disabled
+              label="Phí giao hàng"
+              type="number"
+              value={FEE}
+              controlId="fee"
+            />
+            <FormControl fullWidth>
+              <FormLabel>Phương thức thanh toán</FormLabel>
+              <Select
+                onChange={(e) => {
+                  setFormOrder({
+                    ...formOrder,
+                    paymentmethod: e.target.value,
+                  });
+                }}
+                value={formOrder.paymentmethod}
+                displayEmpty
+                style={{ height: 37 }}
+              >
+                {payment.map((p) => (
+                  <MenuItem value={p.id}>{p.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <div
+              style={{
+                padding: 12,
+                marginLeft: "280px",
+              }}
             >
-              {payment.map((p) => (
-                <MenuItem value={p.id}>{p.name}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
-        <div
-          style={{ padding: 12, display: "flex", justifyContent: "flex-end" }}
-        >
-          <LoadingButton
-            loading={loading}
-            loadingPosition="start"
-            startIcon={<SaveIcon />}
-            variant="outlined"
-            onClick={addOrder}
-          >
-            Save
-          </LoadingButton>
+              <LoadingButton
+                loading={loading}
+                loadingPosition="start"
+                startIcon={<SaveIcon />}
+                variant="outlined"
+                onClick={addOrder}
+              >
+                Đặt món
+              </LoadingButton>
+            </div>
+          </div>
         </div>
       </div>
     </>

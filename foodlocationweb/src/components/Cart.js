@@ -17,11 +17,11 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 export default function CustomizedBadges({ count = 0 }) {
-  const [user, dispatch] = useContext(UserContext);
+  const [user] = useContext(UserContext);
 
   return (
     <>
-      {user ? (
+      {user && user.user_role == 0 ? (
         <div
           style={{
             position: "fixed",

@@ -1,14 +1,12 @@
-import { useState, useContext, useEffect, useMemo } from "react";
+import { useState, useContext, useEffect, useMemo, useRef } from "react";
 import API, { authAPI, endpoints } from "../configs/API";
 import { UserContext } from "../configs/MyContext";
-import Loading from "../layout/Loading";
-import { Button } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Button, Divider } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
 import InfoStore from "../layout/InfoStore";
@@ -18,8 +16,6 @@ import FuncStore, { MAP_INDEX_MENU } from "./FuncStore";
 import ReactVirtualizedTable from "./ReactVirtualizedTable";
 import InputFormUser from "../layout/InputFormUser";
 
-import Box from "@mui/material/Box";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
@@ -30,14 +26,18 @@ import Autocomplete from "@mui/material/Autocomplete";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 
+import LoadingButton from "@mui/lab/LoadingButton";
+import SaveIcon from "@mui/icons-material/Save";
+import Snackbar from "@mui/material/Snackbar";
+
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-const top100Films = [
-  { title: "The Shawshank Redemption", year: 1994 },
-  { title: "The Godfather", year: 1972 },
-  { title: "The Godfather: Part II", year: 1974 },
-];
+// const top100Films = [
+//   { title: "The Shawshank Redemption", year: 1994 },
+//   { title: "The Godfather", year: 1972 },
+//   { title: "The Godfather: Part II", year: 1974 },
+// ];
 
 const columnsMenu = [
   { width: 50, label: "Mã", dataKey: "id", numeric: true },
@@ -50,7 +50,7 @@ const columnsMenu = [
   },
   { width: 120, label: "Trạng thái", dataKey: "active", numeric: false },
   {
-    width: 150,
+    width: 180,
     label: "Hành động",
     dataKey: "action_v1",
     numeric: false,
@@ -73,7 +73,7 @@ const columnsFood = [
   { width: 120, label: "TG nghỉ", dataKey: "end_time", numeric: false },
   { width: 220, label: "Mô tả", dataKey: "description", numeric: false },
   {
-    width: 150,
+    width: 180,
     label: "Hành động",
     dataKey: "action_v1",
     numeric: false,
@@ -142,24 +142,51 @@ const StoreManagement = () => {
   const [open, setOpen] = useState(false);
   const [dataTable, setDataTable] = useState([]);
   const [selectedMenuItem, setSelectedMenuItem] = useState(MAP_INDEX_MENU.MENU);
-  const [age, setAge] = useState("");
   const [menu, setMenu] = useState([]);
+  const [refresher, setRefresher] = useState(1);
   const [tags, setTags] = useState([]);
   const [tagsValue, setTagsValue] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState(null);
+  const [mess, setMess] = useState(null);
+  const [formMenu, setFormMenu] = useState({
+    name: "",
+  });
+  const [formFood, setFormFood] = useState({
+    name: "",
+    price: "",
+    description: "",
+    start_time: "",
+    end_time: "",
+    menu_item: "",
+    tags: "",
+  });
+  const image_food = useRef();
+  const navigate = useNavigate();
 
-  useEffect(() => {
+  const [openMess, setOpenMess] = useState(false);
+
+  const handleCloseMess = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenMess(false);
+  };
+
+  const fetchListMenu = async () => {
     try {
-      const fetchListMenu = async () => {
-        const res = await API.get(endpoints["menu-store"](user.id));
-        if (res.status === 200) {
-          setMenu(res.data);
-        }
-      };
-
-      fetchListMenu();
+      const res = await API.get(endpoints["menu-store"](user.id));
+      if (res.status === 200) {
+        setMenu(res.data);
+      }
     } catch (err) {
       console.error(err);
     }
+  };
+
+  useEffect(() => {
+    fetchListMenu();
   }, [user]);
 
   useEffect(() => {
@@ -170,12 +197,6 @@ const StoreManagement = () => {
 
     loadTags();
   }, []);
-
-  console.log({ tagsValue });
-
-  const handleChange = (event) => {
-    setAge(event.target.value);
-  };
 
   const handleListItemClick = (type) => {
     setSelectedMenuItem(type);
@@ -229,41 +250,63 @@ const StoreManagement = () => {
     };
 
     loadData();
-  }, [selectedMenuItem]);
+  }, [selectedMenuItem, refresher]);
 
+  // load form dialog
   const renderForm = (type) => {
     if (type === MAP_INDEX_MENU.MENU)
       return (
         <InputFormUser
           label="Tên danh mục"
           type="text"
-          value=""
+          value={formMenu.name}
           controlId="name"
-          setValue=""
+          setValue={(e) => {
+            setFormMenu({
+              ...formMenu,
+              name: e.target.value,
+            });
+          }}
         />
       );
 
     return (
       <>
+        {err ? <Alert severity="error">{err}</Alert> : ""}
         <InputFormUser
           label="Tên món ăn"
           type="text"
-          value=""
+          value={formFood.name}
           controlId="name"
-          setValue=""
+          setValue={(e) => {
+            setFormFood({
+              ...formFood,
+              name: e.target.value,
+            });
+          }}
         />
         <InputFormUser
           label="Giá bán"
-          type="text"
-          value=""
+          type="number"
+          value={formFood.price}
           controlId="price"
-          setValue=""
+          setValue={(e) => {
+            setFormFood({
+              ...formFood,
+              price: e.target.value,
+            });
+          }}
         />
         <FormControl fullWidth>
-          <FormLabel>Tên danh mục</FormLabel>
+          <FormLabel>Danh mục</FormLabel>
           <Select
-            value={age}
-            onChange={handleChange}
+            onChange={(e) => {
+              setFormFood({
+                ...formFood,
+                menu_item: e.target.value,
+              });
+            }}
+            value={formFood.menu_item}
             displayEmpty
             style={{ height: 37 }}
           >
@@ -272,20 +315,30 @@ const StoreManagement = () => {
             ))}
           </Select>
         </FormControl>
-        <InputFormUser type="file" label="Ảnh món ăn" />
+        <InputFormUser type="file" ref={image_food} label="Ảnh món ăn" />
         <InputFormUser
           label="Thời gian bắt đầu bán"
           type="time"
-          value=""
+          value={formFood.start_time}
           controlId="st"
-          setValue=""
+          setValue={(e) => {
+            setFormFood({
+              ...formFood,
+              start_time: e.target.value,
+            });
+          }}
         />
         <InputFormUser
           label="Thời gian kết thúc bán"
           type="time"
-          value=""
+          value={formFood.end_time}
           controlId="et"
-          setValue=""
+          setValue={(e) => {
+            setFormFood({
+              ...formFood,
+              end_time: e.target.value,
+            });
+          }}
         />
         <FormControl fullWidth>
           <FormLabel>Mô tả</FormLabel>
@@ -293,8 +346,14 @@ const StoreManagement = () => {
             id="outlined-multiline-static"
             multiline
             rows={4}
-            defaultValue=""
+            value={formFood.description}
             placeholder="Mô tả"
+            onChange={(e) => {
+              setFormFood({
+                ...formFood,
+                description: e.target.value,
+              });
+            }}
           />
         </FormControl>
         <FormControl fullWidth>
@@ -323,7 +382,6 @@ const StoreManagement = () => {
             )}
             onChange={(e, value) => {
               setTagsValue(value);
-              console.log("value :>", value);
             }}
           />
         </FormControl>
@@ -331,6 +389,121 @@ const StoreManagement = () => {
     );
   };
 
+  // addMenu
+  const addMenu = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const params = {
+        ...formMenu,
+        store: user.id,
+      };
+
+      let res = await authAPI().post(endpoints["menu-items"], params);
+      console.info(res);
+
+      if (res.status === 201) {
+        setRefresher(refresher + 1);
+        setFormMenu({
+          name: "",
+        });
+        setOpen(false);
+        setMess(res.data.message);
+        setOpenMess(true);
+        navigate("/store-management");
+      } else setErr("Hệ thống bị lỗi! Vui lòng quay lại sau");
+    } catch (ex) {
+      let e = "";
+      for (let d of Object.values(ex.response.data)) e += `${d} <br />`;
+
+      setErr(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // addFood
+  const addFood = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      let form = new FormData();
+      form.append("name", formFood.name);
+      form.append("price", formFood.price);
+      form.append("description", formFood.description);
+      form.append("start_time", formFood.start_time);
+      form.append("end_time", formFood.end_time);
+      form.append("menu_item", formFood.menu_item);
+
+      const newTags = tagsValue.map((tag) => ({ id: tag.id }));
+      form.append("tags", JSON.stringify(newTags));
+
+      if (image_food.current.files.length > 0) {
+        form.append("image_food", image_food.current.files[0]);
+        let res = await authAPI().post(endpoints["food-store"], form, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        if (res.status === 201) {
+          setFormFood({
+            name: "",
+            price: "",
+            description: "",
+            start_time: "",
+            end_time: "",
+            menu_item: "",
+            image: "",
+          });
+          setTagsValue([]);
+          setRefresher(refresher + 1);
+          setOpen(false);
+          setOpenMess(true);
+          setMess(res.data.message);
+          navigate("/store-management");
+        } else setErr("Hệ thống bị lỗi! Vui lòng quay lại sau");
+      }
+    } catch (ex) {
+      let e = "";
+      for (let d of Object.values(ex.response.data)) e += `${d} <br />`;
+
+      setErr(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // button
+  const renderButtonAdd = (type) => {
+    if (type === MAP_INDEX_MENU.MENU)
+      return (
+        <LoadingButton
+          loading={loading}
+          loadingPosition="start"
+          startIcon={<SaveIcon />}
+          variant="outlined"
+          onClick={addMenu}
+        >
+          Thêm menu
+        </LoadingButton>
+      );
+    else {
+      return (
+        <LoadingButton
+          loading={loading}
+          loadingPosition="start"
+          startIcon={<SaveIcon />}
+          variant="outlined"
+          onClick={addFood}
+          style={{ marginRight: 25 }}
+        >
+          Thêm món ăn
+        </LoadingButton>
+      );
+    }
+  };
+
+  // check columns theo selectedMenuItem
   const columns = useMemo(() => {
     switch (selectedMenuItem) {
       case MAP_INDEX_MENU.FOOD:
@@ -348,6 +521,7 @@ const StoreManagement = () => {
     }
   }, [selectedMenuItem]);
 
+  // check user login
   if (user === null)
     return (
       <Alert severity="warning" sx={{ margin: "10px" }}>
@@ -355,25 +529,19 @@ const StoreManagement = () => {
         bạn!
       </Alert>
     );
-  if (user.user_role !== 1)
+  else if (user.user_role !== 1)
     return (
       <Alert severity="warning">
         Tài khoản của bạn không có quyền truy cập!
       </Alert>
     );
 
-  // if (stores === null) return <Loading />
-
   return (
     <>
-      {/* <h1 className="text-center text-success m-3">QUẢN LÝ CỬA HÀNG</h1> */}
-      {user.is_verify === 0 ? (
-        <Alert severity="warning">
-          Tài khoản của bạn chưa được chứng thực để thực hiện chức năng này!
-        </Alert>
-      ) : (
-        <div>
-          {/* INFO STORE */} <InfoStore />
+      <div>
+        {/* INFO STORE */} <InfoStore />
+        {/* CHỨC NĂNG QUẢN LÝ */}
+        {user.is_verify == 1 ? (
           <div style={{ display: "flex", gap: "15px" }}>
             {/* DANH SÁCH CHỨC NĂNG */}
             <FuncStore
@@ -396,23 +564,54 @@ const StoreManagement = () => {
                 <AddIcon />
                 <span style={{ fontSize: "16px" }}>Tạo mới</span>
               </Button>
+
+              {/* TABLE */}
               <ReactVirtualizedTable columns={columns} rows={dataTable} />
             </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <Alert severity="warning">
+            Tài khoản của bạn chưa được chứng thực để thực hiện chức năng quản
+            lý!
+          </Alert>
+        )}
+      </div>
+
+      {/* MESSAGE */}
+      <Snackbar
+        open={openMess}
+        autoHideDuration={6000}
+        onClose={handleCloseMess}
+      >
+        <Alert onClose={handleCloseMess}>{mess}</Alert>
+      </Snackbar>
 
       {/* DIALOG ADD */}
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>TẠO MỚI</DialogTitle>
-        <DialogContent>{renderForm(selectedMenuItem)}</DialogContent>
+      <Dialog open={open} onClose={handleClose} style={{ minWidth: "400px" }}>
+        <DialogTitle
+          style={{
+            color: "Highlight",
+            fontSize: 20,
+            fontWeight: "bold",
+            padding: "10px 20px",
+            minWidth: "400px",
+          }}
+        >
+          TẠO MỚI
+        </DialogTitle>
+        <Divider color="gray" />
+        <DialogContent style={{ minWidth: "400px" }}>
+          {renderForm(selectedMenuItem)}
+        </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} style={{ color: "red" }}>
+          <Button
+            onClick={handleClose}
+            variant="outlined"
+            style={{ color: "red", borderColor: "red" }}
+          >
             Hủy
           </Button>
-          <Button onClick={handleClose} style={{ color: "green" }}>
-            Thêm
-          </Button>
+          {renderButtonAdd(selectedMenuItem)}
         </DialogActions>
       </Dialog>
     </>
