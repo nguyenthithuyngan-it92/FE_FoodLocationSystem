@@ -125,6 +125,12 @@ const StoreManagement = () => {
     },
     { width: 150, label: "Ngày tạo", dataKey: "created_date", numeric: false },
     {
+      width: 130,
+      label: "Phương thức TT",
+      dataKey: "paymentmethod_name",
+      numeric: true,
+    },
+    {
       width: 110,
       label: "TT thanh toán",
       dataKey: "payment_status",
@@ -229,7 +235,7 @@ const StoreManagement = () => {
             res = {
               data: temp.data.map((item) => {
                 const { menu_item = {}, ...restInfo } = item;
-                console.log({ menu_item });
+                // console.log({ menu_item });
                 return {
                   ...restInfo,
                   menu_name: menu_item.name || "",
@@ -248,7 +254,16 @@ const StoreManagement = () => {
               url = "order-accepted";
             }
 
-            res = await authAPI().get(endpoints[url]);
+            let temp_o = await authAPI().get(endpoints[url]);
+            res = {
+              data: temp_o.data.map((item) => {
+                const { paymentmethod = {}, ...restInfo } = item;
+                return {
+                  ...restInfo,
+                  paymentmethod_name: paymentmethod.name || "",
+                };
+              }),
+            };
             break;
           default:
             res = await authAPI().get(endpoints["menu-management"]);
@@ -480,7 +495,20 @@ const StoreManagement = () => {
     }
   };
 
-  const handleConfirmOrder = async(data);
+  const handleConfirmOrder = async (data) => {
+    try {
+      let res = await authAPI().post(endpoints["confirm-order"](data.id));
+      if (res && res.status === 200) {
+        setMess(res.data.message);
+        setOpenMess(true);
+        setRefresher((pre) => pre + 1);
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // addFood
   const addFood = async (e) => {
