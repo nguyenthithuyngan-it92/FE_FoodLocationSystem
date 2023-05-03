@@ -13,7 +13,9 @@ import InfoStore from "../layout/InfoStore";
 import Alert from "@mui/material/Alert";
 import AddIcon from "@mui/icons-material/Add";
 import FuncStore, { MAP_INDEX_MENU } from "./FuncStore";
-import ReactVirtualizedTable from "./ReactVirtualizedTable";
+import ReactVirtualizedTable, {
+  ACTION_TYPES_V1,
+} from "./ReactVirtualizedTable";
 import InputFormUser from "../layout/InputFormUser";
 
 import MenuItem from "@mui/material/MenuItem";
@@ -39,116 +41,124 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 //   { title: "The Godfather: Part II", year: 1974 },
 // ];
 
-const columnsMenu = [
-  { width: 50, label: "Mã", dataKey: "id", numeric: true },
-  { width: 120, label: "Tên danh mục", dataKey: "name", numeric: false },
-  {
-    width: 120,
-    label: "Số lượng món ăn",
-    dataKey: "food_count",
-    numeric: true,
-  },
-  { width: 120, label: "Trạng thái", dataKey: "active", numeric: false },
-  {
-    width: 180,
-    label: "Hành động",
-    dataKey: "action_v1",
-    numeric: false,
-    service: () => console.log("hihi"),
-  },
-];
-
-const columnsFood = [
-  { width: 50, label: "Mã", dataKey: "id", numeric: true },
-  { width: 200, label: "Tên món ăn", dataKey: "name", numeric: false },
-  { width: 120, label: "Giá", dataKey: "price", numeric: true },
-  {
-    width: 120,
-    label: "Danh mục",
-    dataKey: "menu_name",
-    numeric: true,
-  },
-  { width: 80, label: "Trạng thái", dataKey: "active", numeric: false },
-  { width: 120, label: "TG bán", dataKey: "start_time", numeric: false },
-  { width: 120, label: "TG nghỉ", dataKey: "end_time", numeric: false },
-  { width: 220, label: "Mô tả", dataKey: "description", numeric: false },
-  {
-    width: 180,
-    label: "Hành động",
-    dataKey: "action_v1",
-    numeric: false,
-    service: () => console.log("hihi"),
-  },
-];
-
-const columnsOrder = [
-  { width: 50, label: "Mã", dataKey: "id", numeric: true },
-  {
-    width: 100,
-    label: "TT đơn hàng",
-    dataKey: "order_status",
-    numeric: true,
-  },
-  {
-    width: 150,
-    label: "Tài khoản đặt hàng",
-    dataKey: "user",
-    numeric: false,
-  },
-  {
-    width: 150,
-    label: "Tên người nhận",
-    dataKey: "receiver_name",
-    numeric: false,
-  },
-  {
-    width: 200,
-    label: "Địa chỉ nhận",
-    dataKey: "receiver_address",
-    numeric: false,
-  },
-  { width: 100, label: "SĐT nhận", dataKey: "receiver_phone", numeric: false },
-  { width: 100, label: "Tổng tiền", dataKey: "amount", numeric: true },
-  {
-    width: 130,
-    label: "Phí giao hàng",
-    dataKey: "delivery_fee",
-    numeric: true,
-  },
-  { width: 150, label: "Ngày tạo", dataKey: "created_date", numeric: false },
-  {
-    width: 110,
-    label: "TT thanh toán",
-    dataKey: "payment_status",
-    numeric: false,
-  },
-  {
-    width: 200,
-    label: "Ngày thanh toán",
-    dataKey: "payment_date",
-    numeric: false,
-  },
-  {
-    width: 150,
-    label: "Hành động",
-    dataKey: "action_v2",
-    numeric: false,
-    service: () => console.log("hihi"),
-  },
-];
-
 const StoreManagement = () => {
+  const columnsMenu = [
+    { width: 50, label: "Mã", dataKey: "id", numeric: true },
+    { width: 120, label: "Tên danh mục", dataKey: "name", numeric: false },
+    {
+      width: 120,
+      label: "Số lượng món ăn",
+      dataKey: "food_count",
+      numeric: true,
+    },
+    { width: 120, label: "Trạng thái", dataKey: "active", numeric: false },
+    {
+      width: 180,
+      label: "Hành động",
+      dataKey: "action_v1",
+      numeric: false,
+      service: (type, data) => handleActionMenu(type, data),
+    },
+  ];
+
+  const columnsFood = [
+    { width: 50, label: "Mã", dataKey: "id", numeric: true },
+    { width: 200, label: "Tên món ăn", dataKey: "name", numeric: false },
+    { width: 120, label: "Giá", dataKey: "price", numeric: true },
+    {
+      width: 120,
+      label: "Danh mục",
+      dataKey: "menu_name",
+      numeric: true,
+    },
+    { width: 120, label: "TG bán", dataKey: "start_time", numeric: false },
+    { width: 120, label: "TG nghỉ", dataKey: "end_time", numeric: false },
+    { width: 80, label: "Trạng thái", dataKey: "active", numeric: false },
+    { width: 220, label: "Mô tả", dataKey: "description", numeric: false },
+    {
+      width: 180,
+      label: "Hành động",
+      dataKey: "action_v1",
+      numeric: false,
+      service: (type, data) => handleActionFood(type, data),
+    },
+  ];
+
+  const columnsOrder = [
+    { width: 50, label: "Mã", dataKey: "id", numeric: true },
+    {
+      width: 100,
+      label: "TT đơn hàng",
+      dataKey: "order_status",
+      numeric: true,
+    },
+    {
+      width: 150,
+      label: "Tài khoản đặt hàng",
+      dataKey: "user",
+      numeric: false,
+    },
+    {
+      width: 150,
+      label: "Tên người nhận",
+      dataKey: "receiver_name",
+      numeric: false,
+    },
+    {
+      width: 200,
+      label: "Địa chỉ nhận",
+      dataKey: "receiver_address",
+      numeric: false,
+    },
+    {
+      width: 100,
+      label: "SĐT nhận",
+      dataKey: "receiver_phone",
+      numeric: false,
+    },
+    { width: 100, label: "Tổng tiền", dataKey: "amount", numeric: true },
+    {
+      width: 130,
+      label: "Phí giao hàng",
+      dataKey: "delivery_fee",
+      numeric: true,
+    },
+    { width: 150, label: "Ngày tạo", dataKey: "created_date", numeric: false },
+    {
+      width: 110,
+      label: "TT thanh toán",
+      dataKey: "payment_status",
+      numeric: false,
+    },
+    {
+      width: 200,
+      label: "Ngày thanh toán",
+      dataKey: "payment_date",
+      numeric: false,
+    },
+    {
+      width: 150,
+      label: "Hành động",
+      dataKey: "action_v2",
+      numeric: false,
+      service: (data) => handleConfirmOrder(data),
+    },
+  ];
+
   const [user] = useContext(UserContext);
   const [open, setOpen] = useState(false);
   const [dataTable, setDataTable] = useState([]);
   const [selectedMenuItem, setSelectedMenuItem] = useState(MAP_INDEX_MENU.MENU);
   const [menu, setMenu] = useState([]);
   const [refresher, setRefresher] = useState(1);
+
   const [tags, setTags] = useState([]);
   const [tagsValue, setTagsValue] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
   const [mess, setMess] = useState(null);
+
   const [formMenu, setFormMenu] = useState({
     name: "",
   });
@@ -180,9 +190,7 @@ const StoreManagement = () => {
       if (res.status === 200) {
         setMenu(res.data);
       }
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) {}
   };
 
   useEffect(() => {
@@ -198,6 +206,7 @@ const StoreManagement = () => {
     loadTags();
   }, []);
 
+  // event click
   const handleListItemClick = (type) => {
     setSelectedMenuItem(type);
   };
@@ -211,6 +220,7 @@ const StoreManagement = () => {
   // load store
   useEffect(() => {
     let loadData = async () => {
+      console.log("trigger refresher");
       try {
         let res = [];
         switch (selectedMenuItem) {
@@ -403,7 +413,7 @@ const StoreManagement = () => {
       console.info(res);
 
       if (res.status === 201) {
-        setRefresher(refresher + 1);
+        setRefresher((pre) => pre + 1);
         setFormMenu({
           name: "",
         });
@@ -421,6 +431,56 @@ const StoreManagement = () => {
       setLoading(false);
     }
   };
+
+  // ACTION MENU (EDIT, DELETE, CHANGE_STATUS)
+  const handleActionMenu = async (type, data) => {
+    try {
+      let res;
+      if (type === ACTION_TYPES_V1.CHANGE_STATUS) {
+        res = await authAPI().post(endpoints["status-menu"](data.id));
+      }
+      if (type === ACTION_TYPES_V1.DELETE) {
+        res = await authAPI().delete(endpoints["action-menu"](data.id));
+      }
+      if (type === ACTION_TYPES_V1.EDIT) {
+        res = await authAPI().put(endpoints["action-menu"](data.id));
+      }
+
+      if (res && res.status === 200) {
+        setMess(res.data.message);
+        setOpenMess(true);
+        setRefresher((pre) => pre + 1);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // ACTION FOOD (EDIT, DELETE, CHANGE_STATUS)
+  const handleActionFood = async (type, data) => {
+    try {
+      let res;
+      if (type === ACTION_TYPES_V1.CHANGE_STATUS) {
+        res = await authAPI().post(endpoints["status-food"](data.id));
+      }
+      if (type === ACTION_TYPES_V1.DELETE) {
+        res = await authAPI().delete(endpoints["action-food"](data.id));
+      }
+      if (type === ACTION_TYPES_V1.EDIT) {
+        res = await authAPI().put(endpoints["action-food"](data.id));
+      }
+
+      if (res && res.status === 200) {
+        setMess(res.data.message);
+        setOpenMess(true);
+        setRefresher((pre) => pre + 1);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleConfirmOrder = async(data);
 
   // addFood
   const addFood = async (e) => {
@@ -456,7 +516,7 @@ const StoreManagement = () => {
             image: "",
           });
           setTagsValue([]);
-          setRefresher(refresher + 1);
+          setRefresher((pre) => pre + 1);
           setOpen(false);
           setOpenMess(true);
           setMess(res.data.message);

@@ -17,13 +17,19 @@ import RuleIcon from "@mui/icons-material/Rule";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox";
 import AddBoxIcon from "@mui/icons-material/AddBox";
-import { Button } from "@mui/material";
+import { Button, Tooltip } from "@mui/material";
 
 import { numberWithCommas } from "../utils/converters";
 
 export const ACTION_TYPES = {
   MINUS: "-",
   PLUS: "+",
+};
+
+export const ACTION_TYPES_V1 = {
+  CHANGE_STATUS: "change_status",
+  EDIT: "edit",
+  DELETE: "delete",
 };
 
 const sample = [
@@ -189,56 +195,68 @@ export default function ReactVirtualizedTable(props) {
         case "action_v1":
           return (
             <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-              <Button
-                size="small"
-                variant="outlined"
-                style={{ minWidth: 50, color: "blue", borderColor: "blue" }}
-                onClick={() => {
-                  if (typeof column.service === "function") {
-                    column.service();
-                  }
-                }}
-              >
-                <RuleIcon />
-              </Button>
-              <Button
-                size="small"
-                variant="outlined"
-                style={{ minWidth: 50, color: "orange", borderColor: "orange" }}
-                onClick={() => {
-                  if (typeof column.service === "function") {
-                    column.service();
-                  }
-                }}
-              >
-                <EditIcon />
-              </Button>
-              <Button
-                size="small"
-                variant="outlined"
-                style={{ minWidth: 50, color: "red", borderColor: "red" }}
-                onClick={() => {
-                  if (typeof column.service === "function") {
-                    column.service();
-                  }
-                }}
-              >
-                <DeleteOutlineIcon />
-              </Button>
+              <Tooltip title="Chuyển trạng thái">
+                <Button
+                  size="small"
+                  variant="outlined"
+                  style={{ minWidth: 50, color: "blue", borderColor: "blue" }}
+                  onClick={() => {
+                    if (typeof column.service === "function") {
+                      column.service(ACTION_TYPES_V1.CHANGE_STATUS, row);
+                    }
+                  }}
+                >
+                  <RuleIcon />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Chỉnh sửa">
+                <Button
+                  size="small"
+                  variant="outlined"
+                  style={{
+                    minWidth: 50,
+                    color: "orange",
+                    borderColor: "orange",
+                  }}
+                  onClick={() => {
+                    if (typeof column.service === "function") {
+                      column.service(ACTION_TYPES_V1.EDIT, row);
+                    }
+                  }}
+                >
+                  <EditIcon />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Xóa">
+                <Button
+                  size="small"
+                  variant="outlined"
+                  style={{ minWidth: 50, color: "red", borderColor: "red" }}
+                  onClick={() => {
+                    if (typeof column.service === "function") {
+                      column.service(ACTION_TYPES_V1.DELETE, row);
+                    }
+                  }}
+                >
+                  <DeleteOutlineIcon />
+                </Button>
+              </Tooltip>
             </div>
           );
         case "action_v2":
           return (
-            <Button
-              variant="outlined"
-              onClick={() => {
-                if (typeof column.service === "function") {
-                  column.service();
-                }
-              }}
-            >
-              Xác nhận
-            </Button>
+            <Tooltip title="Xác nhận đơn hàng">
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  if (typeof column.service === "function") {
+                    column.service();
+                  }
+                }}
+              >
+                Xác nhận
+              </Button>
+            </Tooltip>
           );
         default:
           return row[column.dataKey];
