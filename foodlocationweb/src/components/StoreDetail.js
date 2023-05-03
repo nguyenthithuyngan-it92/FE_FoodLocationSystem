@@ -36,7 +36,7 @@ import { Tooltip } from "@mui/material";
 import { UserContext } from "../configs/MyContext";
 
 const StoreDetail = () => {
-  const [user, dispatch] = useContext(UserContext);
+  const [user] = useContext(UserContext);
 
   const [menuItem, setMenuItem] = useState([]);
   const [countCart, setCountCart] = useState(0);
@@ -45,7 +45,7 @@ const StoreDetail = () => {
   const { storeId, foodId } = useParams();
 
   useEffect(() => {
-    console.log(listCart);
+    // console.log(listCart);
     if (user) {
       const count = [...(listCart || [])].reduce(
         (accu, currentValue) => accu + currentValue.quantity,
@@ -182,8 +182,8 @@ const StoreDetail = () => {
                 </Fragment>
               }
             />
-            {!user ? (
-              <Tooltip title="Vui lòng đăng nhập">
+            {!user || user.user_role == 1 ? (
+              <Tooltip title="Vui lòng đăng nhập tài khoản khách hàng">
                 <IconButton
                   color="success"
                   aria-label="add to shopping cart"

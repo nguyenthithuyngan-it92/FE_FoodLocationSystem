@@ -22,6 +22,9 @@ export const endpoints = {
   "order-store": "/orders/",
   "order-pending": "/orders/pending-order/",
   "order-accepted": "/orders/accepted-order/",
+  "food-store": "/food-store/",
+  "status-menu": (menuId) => `/menu-items/${menuId}/set-status-menu/`,
+  "status-food": (foodId) => `/food-store/${foodId}/set-status-food/`,
 };
 
 export const authAPI = () =>

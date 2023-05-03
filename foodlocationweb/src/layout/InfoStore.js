@@ -10,9 +10,17 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import AddAlertIcon from "@mui/icons-material/AddAlert";
 import Typography from "@mui/material/Typography";
+import { Alert } from "@mui/material";
 
 const InfoStore = () => {
   const [user] = useContext(UserContext);
+
+  if (user.is_verify === 0)
+    return (
+      <Alert severity="warning">
+        Tài khoản của bạn chưa được chứng thực để thực hiện chức năng này!
+      </Alert>
+    );
 
   return (
     <>
