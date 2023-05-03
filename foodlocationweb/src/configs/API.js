@@ -24,7 +24,9 @@ export const endpoints = {
   "order-accepted": "/orders/accepted-order/",
   "food-store": "/food-store/",
   "status-menu": (menuId) => `/menu-items/${menuId}/set-status-menu/`,
+  "action-menu": (menuId) => `/menu-items/${menuId}/`,
   "status-food": (foodId) => `/food-store/${foodId}/set-status-food/`,
+  "action-food": (foodId) => `/food-store/${foodId}/`,
 };
 
 export const authAPI = () =>
