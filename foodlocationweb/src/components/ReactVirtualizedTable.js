@@ -20,6 +20,7 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import { Button, Tooltip } from "@mui/material";
 
 import { numberWithCommas } from "../utils/converters";
+import LoadingButton from "@mui/lab/LoadingButton/LoadingButton";
 
 export const ACTION_TYPES = {
   MINUS: "-",
@@ -101,6 +102,7 @@ const VirtuosoTableComponents = {
 
 export default function ReactVirtualizedTable(props) {
   const { columns = columnsDefault, rows = rowsDefault } = props;
+  const [loading, setLoading] = React.useState(false);
 
   const fixedHeaderContent = () => {
     return (
@@ -246,16 +248,18 @@ export default function ReactVirtualizedTable(props) {
         case "action_v2":
           return (
             <Tooltip title="Xác nhận đơn hàng">
-              <Button
+              <LoadingButton
+                loading={loading}
+                loadingPosition="start"
                 variant="outlined"
                 onClick={() => {
                   if (typeof column.service === "function") {
-                    column.service();
+                    column.service(row);
                   }
                 }}
               >
                 Xác nhận
-              </Button>
+              </LoadingButton>
             </Tooltip>
           );
         default:

@@ -22,6 +22,8 @@ export const endpoints = {
   "order-store": "/orders/",
   "order-pending": "/orders/pending-order/",
   "order-accepted": "/orders/accepted-order/",
+  "confirm-order": (orderId) => `/orders/${orderId}/confirm-order/`,
+
   "food-store": "/food-store/",
   "status-menu": (menuId) => `/menu-items/${menuId}/set-status-menu/`,
   "action-menu": (menuId) => `/menu-items/${menuId}/`,
