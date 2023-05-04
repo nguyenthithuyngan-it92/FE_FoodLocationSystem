@@ -1,8 +1,8 @@
 import InfoStore from "../layout/InfoStore";
 import { useContext, useState, useEffect, Fragment } from "react";
 import Loading from "../layout/Loading";
-import API, { authAPI, endpoints } from "../configs/API";
-import { useParams } from "react-router-dom";
+import API, { endpoints } from "../configs/API";
+import { Link, useParams } from "react-router-dom";
 
 import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
@@ -28,12 +28,12 @@ import DescriptionIcon from "@mui/icons-material/Description";
 
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
-import FaceIcon from "@mui/icons-material/Face";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import { isValidTime } from "../utils";
 import CustomizedBadges from "./Cart";
 import { Tooltip } from "@mui/material";
 import { UserContext } from "../configs/MyContext";
+import StorefrontIcon from "@mui/icons-material/Storefront";
 
 const StoreDetail = () => {
   const [user] = useContext(UserContext);
@@ -140,6 +140,7 @@ const StoreDetail = () => {
     }
   };
 
+  if (food === null) return <Loading />;
   if (menuItem.length === 0) return <Loading />;
 
   const renderFoodItem = (listFoods = []) => {
@@ -152,9 +153,18 @@ const StoreDetail = () => {
             alignItems="flex-start"
             disabled={!item.active || !isValidTime(item)}
           >
-            <ListItemAvatar>
-              <Avatar alt={item.name} src={item.image} />
-            </ListItemAvatar>
+            <Tooltip title="Xem chi tiết món ăn">
+              <Link to={`/foods/${item.id}`} style={{ textDecoration: "none" }}>
+                <ListItemAvatar>
+                  <Avatar
+                    style={{ width: 50, height: 50, marginRight: 15 }}
+                    alt={item.name}
+                    src={item.image}
+                  />
+                </ListItemAvatar>
+              </Link>
+            </Tooltip>
+
             <ListItemText
               primary={item.name}
               secondary={
@@ -182,12 +192,16 @@ const StoreDetail = () => {
                 </Fragment>
               }
             />
+
             {!user || user.user_role == 1 ? (
               <Tooltip title="Vui lòng đăng nhập tài khoản khách hàng">
                 <IconButton
                   color="success"
                   aria-label="add to shopping cart"
-                  style={{ opacity: "0.5", cursor: "not-allowed" }}
+                  style={{
+                    opacity: "0.5",
+                    cursor: "not-allowed",
+                  }}
                 >
                   <AddShoppingCartIcon />
                 </IconButton>
@@ -210,13 +224,13 @@ const StoreDetail = () => {
 
   return (
     <>
-      {/* <InfoStore /> */}
+      {/* INFO FOOD DETAIL */}
       <Card sx={{ display: "flex", margin: "10px" }}>
         <CardMedia
           component="img"
           src={food.image}
           alt={food.name}
-          sx={{ width: 160, height: 160, objectFit: "cover", margin: "25px" }}
+          sx={{ width: 250, height: 250, objectFit: "cover", margin: "25px" }}
         />
         <Box sx={{ display: "flex", flexDirection: "column" }}>
           <CardContent sx={{ flex: "1 0 auto" }}>
@@ -225,7 +239,11 @@ const StoreDetail = () => {
               variant="h4"
               sx={{ flex: "1 0 auto", marginTop: "5px" }}
             >
-              {food.name}
+              {food.name}{" "}
+              <span style={{ fontSize: 24, color: "gray" }}>
+                - {food.menu_item.store.name_store}{" "}
+                <StorefrontIcon style={{ fontSize: 20, marginBottom: 5 }} />
+              </span>
             </Typography>
             <Typography
               variant="subtitle1"
@@ -234,7 +252,8 @@ const StoreDetail = () => {
               sx={{
                 flex: "1 0 auto",
                 marginTop: "10px",
-                fontSize: "16px",
+                fontSize: "20px",
+                color: "Highlight",
                 fontWeight: "bold",
               }}
             >
@@ -244,10 +263,19 @@ const StoreDetail = () => {
               variant="subtitle1"
               color="text.secondary"
               component="div"
-              sx={{ flex: "1 0 auto", marginTop: "10px", fontSize: "13px" }}
+              sx={{
+                flex: "1 0 auto",
+                marginTop: "10px",
+                fontSize: "13px",
+                marginBottom: 2,
+              }}
             >
               <DescriptionIcon /> {food.description}
             </Typography>
+            <Link to={`/foods/${food.id}`} style={{ textDecoration: "none" }}>
+              Xem thêm đánh giá món ăn
+            </Link>
+
             <Stack direction="row" spacing={1} style={{ margin: "20px 10px" }}>
               {[...(food.tags || [])].map((tag) => {
                 return (
@@ -262,6 +290,8 @@ const StoreDetail = () => {
           </CardContent>
         </Box>
       </Card>
+
+      {/* DANH SÁCH MENU CỦA STORE */}
       <div style={{ display: "flex" }}>
         <MenuItem />
         <List sx={{ flex: 1, overflow: "hidden", bgcolor: "background.paper" }}>
