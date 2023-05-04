@@ -15,6 +15,7 @@ import RegisterStore from "./components/RegiterStore";
 import StoreManagement from "./components/StoreManagement";
 import StoreDetail from "./components/StoreDetail";
 import CartOrder from "./components/CartOrder";
+import ProfileUser from "./components/ProfileUser";
 <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/icon?family=Material+Icons"
@@ -39,6 +40,7 @@ function App() {
             <Route path="/register" element={<RegisterUser />} />
             <Route path="/register-store" element={<RegisterStore />} />
             <Route path="/store-management" element={<StoreManagement />} />
+            <Route path="/profile-user" element={<ProfileUser />} />
             <Route
               path="/stores/:storeId/menu/:foodId"
               element={<StoreDetail />}

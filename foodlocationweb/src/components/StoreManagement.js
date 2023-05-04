@@ -226,7 +226,7 @@ const StoreManagement = () => {
   // load store
   useEffect(() => {
     let loadData = async () => {
-      console.log("trigger refresher");
+      // console.log("trigger refresher");
       try {
         let res = [];
         switch (selectedMenuItem) {

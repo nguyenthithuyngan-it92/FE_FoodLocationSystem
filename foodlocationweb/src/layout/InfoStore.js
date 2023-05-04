@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../configs/MyContext";
 
 import Box from "@mui/material/Box";
@@ -11,9 +11,21 @@ import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import AddAlertIcon from "@mui/icons-material/AddAlert";
 import Typography from "@mui/material/Typography";
 import { Alert } from "@mui/material";
+import API, { endpoints } from "../configs/API";
 
 const InfoStore = () => {
   const [user] = useContext(UserContext);
+  const [countFollower, setCountFollower] = useState(0);
+
+  useEffect(() => {
+    const loadCountFollower = async () => {
+      let res = await API.get(endpoints["count-follower"](user.id));
+      console.log(res.data[0]);
+      setCountFollower(res.data[0].total_followers);
+    };
+
+    loadCountFollower();
+  }, [user.id]);
 
   if (user.is_verify === 0)
     return (
@@ -68,9 +80,15 @@ const InfoStore = () => {
             <IconButton aria-label="subcribes">
               <AddAlertIcon sx={{ height: 20, width: 20 }} />
             </IconButton>
-            <Typography component="div" variant="h8" color="text.secondary">
-              0 người theo dõi
-            </Typography>
+            {countFollower ? (
+              <Typography component="div" variant="h8" color="text.secondary">
+                {countFollower} người theo dõi
+              </Typography>
+            ) : (
+              <Typography component="div" variant="h8" color="text.secondary">
+                0 người theo dõi
+              </Typography>
+            )}
           </Box>
         </Box>
       </Card>
