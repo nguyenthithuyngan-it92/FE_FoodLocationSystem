@@ -240,10 +240,17 @@ const StoreDetail = () => {
               sx={{ flex: "1 0 auto", marginTop: "5px" }}
             >
               {food.name}{" "}
-              <span style={{ fontSize: 24, color: "gray" }}>
-                - {food.menu_item.store.name_store}{" "}
-                <StorefrontIcon style={{ fontSize: 20, marginBottom: 5 }} />
-              </span>
+              <Tooltip title="Xem chi tiết cửa hàng">
+                <Link
+                  to={`/stores/${food.menu_item.store.id}`}
+                  style={{ textDecoration: "none" }}
+                >
+                  <span style={{ fontSize: 24, color: "gray" }}>
+                    - {food.menu_item.store.name_store}{" "}
+                    <StorefrontIcon style={{ fontSize: 20, marginBottom: 5 }} />
+                  </span>
+                </Link>
+              </Tooltip>
             </Typography>
             <Typography
               variant="subtitle1"

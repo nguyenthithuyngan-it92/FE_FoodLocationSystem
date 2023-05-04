@@ -6,6 +6,7 @@ export const endpoints = {
   foods: "/foods/",
   "food-by-id": (foodId) => `/foods/${foodId}/`,
   stores: "/stores/",
+  "store-detail": (storeId) => `/stores/${storeId}/`,
   user: "/users/",
   "menu-items": "/menu-items/",
   orders: "/orders/",
