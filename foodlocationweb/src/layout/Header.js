@@ -17,6 +17,7 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import ButtonM from "@mui/material/Button";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 
 const Header = () => {
   const [tags, setTags] = useState([]);
@@ -135,9 +136,15 @@ const Header = () => {
             </MenuItem>
 
             <MenuItem onClick={handleClose}>
-              <Link to="#" className="nav-link text-primary">
-                <ManageAccountsIcon fontSize="small" /> Quản lý tài khoản
-              </Link>
+              {user.is_superuser == 1 ? (
+                <Link to="#" className="nav-link text-primary">
+                  <AdminPanelSettingsIcon fontSize="small" /> Trang quản trị
+                </Link>
+              ) : (
+                <Link to="/profile-user" className="nav-link text-primary">
+                  <ManageAccountsIcon fontSize="small" /> Quản lý tài khoản
+                </Link>
+              )}
             </MenuItem>
             <MenuItem onClick={handleClose}>
               <Link className="nav-link text-danger" onClick={logout}>
