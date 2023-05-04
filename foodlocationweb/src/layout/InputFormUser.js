@@ -12,7 +12,7 @@ const InputFormUser = React.forwardRef((props, ref) => {
 
   return (
     <Form.Group className="mb-3" controlId={props.controlId}>
-      <Form.Label>{props.label}</Form.Label>
+      <Form.Label style={{ color: "gray" }}>{props.label}</Form.Label>
       <Form.Control
         type={props.type}
         value={props.value}
