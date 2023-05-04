@@ -1,7 +1,15 @@
 import { useContext, useEffect, useState } from "react";
 import InputFormUser from "../layout/InputFormUser";
 import ReactVirtualizedTable, { ACTION_TYPES } from "./ReactVirtualizedTable";
-import { Divider, FormControl, MenuItem, Select } from "@mui/material";
+import {
+  Alert,
+  AlertTitle,
+  Divider,
+  FormControl,
+  MenuItem,
+  Select,
+  Snackbar,
+} from "@mui/material";
 import { FormLabel } from "react-bootstrap";
 import API, { authAPI, endpoints } from "../configs/API";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -26,6 +34,16 @@ const CartOrder = () => {
     paymentmethod: "",
   });
   const navigate = useNavigate();
+  const [mess, setMess] = useState(null);
+  const [openMess, setOpenMess] = useState(false);
+
+  const handleCloseMess = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenMess(false);
+  };
 
   const columnsCart = [
     { width: 100, label: "Mã món ăn", dataKey: "id", numeric: false },
@@ -141,6 +159,8 @@ const CartOrder = () => {
         navigate("/");
       }
     } catch {
+      setMess("Đặt không thành công! Vui lòng kiểm tra lại các món ăn đặt!!!");
+      setOpenMess(true);
     } finally {
       setLoading(false);
     }
@@ -150,6 +170,17 @@ const CartOrder = () => {
 
   return (
     <>
+      {/* MESSAGE */}
+      <Snackbar
+        open={openMess}
+        autoHideDuration={6000}
+        onClose={handleCloseMess}
+      >
+        <Alert severity="error" onClose={handleCloseMess}>
+          <AlertTitle>Lỗi đặt món</AlertTitle>
+          {mess}
+        </Alert>
+      </Snackbar>
       <div style={{ border: "1px solid", margin: 10, borderRadius: 5 }}>
         <h6 style={{ margin: 10, color: "gray" }}>Thông tin món ăn được đặt</h6>
         <ReactVirtualizedTable columns={columnsCart} rows={listCart} />

@@ -75,6 +75,12 @@ const RegisterStore = () => {
 
   return (
     <>
+      <h1 className="text-center text-success" style={{ marginTop: 10 }}>
+        ĐĂNG KÝ CỬA HÀNG
+      </h1>
+
+      {err ? <Alert severity="error">{err}</Alert> : ""}
+      
       <Form onSubmit={registerStore}>
         <div style={{ margin: 10, display: "flex" }}>
           <div style={{ width: "50%", margin: 10 }}>

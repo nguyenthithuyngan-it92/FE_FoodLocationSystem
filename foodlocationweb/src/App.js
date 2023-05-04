@@ -16,6 +16,7 @@ import StoreManagement from "./components/StoreManagement";
 import StoreDetail from "./components/StoreDetail";
 import CartOrder from "./components/CartOrder";
 import ProfileUser from "./components/ProfileUser";
+import FoodDetail from "./components/FoodDetail";
 <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/icon?family=Material+Icons"
@@ -46,6 +47,7 @@ function App() {
               element={<StoreDetail />}
             />
             <Route path="/cart" element={<CartOrder />} />
+            <Route path="/foods/:foodId/" element={<FoodDetail />} />
             <Route path="*" element={<h1>Comming soon...</h1>}></Route>
           </Routes>
         </Container>
