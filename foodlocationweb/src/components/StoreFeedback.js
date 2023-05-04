@@ -13,6 +13,7 @@ import Loading from "../layout/Loading";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import IconButton from "@mui/material/IconButton";
+import TableChartIcon from "@mui/icons-material/TableChart";
 
 const StoreFeedback = () => {
   const [user] = useContext(UserContext);
@@ -85,6 +86,15 @@ const StoreFeedback = () => {
               sx={{ flex: "1 0 auto", marginTop: "10px" }}
             >
               <LocalPhoneIcon /> {store.phone}
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              color="text.secondary"
+              component="div"
+              sx={{ flex: "1 0 auto", marginTop: "10px" }}
+            >
+              <TableChartIcon style={{ marginRight: 5 }} />
+              Có {store.menu_count} danh mục
             </Typography>
           </CardContent>
           <Box
