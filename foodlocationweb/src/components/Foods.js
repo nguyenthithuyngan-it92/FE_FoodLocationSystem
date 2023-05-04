@@ -105,18 +105,22 @@ const Foods = () => {
             );
           })}
         </Row>
-        <ButtonGroup aria-label="paging" className="p-1">
+        <ButtonGroup
+          aria-label="paging"
+          className="p-1"
+          style={{ marginLeft: "40%" }}
+        >
           <Button
             onClick={prevPage}
             variant="outlined"
-            style={{ border: "1px solid" }}
+            style={{ border: "1px solid", margin: 5 }}
           >
             <ArrowBackIosIcon />
           </Button>
           <Button
             onClick={nextPage}
             variant="outlined"
-            style={{ border: "1px solid" }}
+            style={{ border: "1px solid", margin: 5 }}
           >
             <ArrowForwardIosIcon />
           </Button>
