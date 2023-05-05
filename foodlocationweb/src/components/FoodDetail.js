@@ -27,7 +27,6 @@ const FoodDetail = () => {
   useEffect(() => {
     let loadFoodDetailById = async () => {
       let res = await API.get(endpoints["food-by-id"](foodId));
-      console.log(res.data);
       if (res.status === 200) {
         setFoodDetail(res.data);
       }
@@ -71,7 +70,7 @@ const FoodDetail = () => {
               <PaymentsIcon /> {numberWithCommas(foodDetail.price)} VND
             </Typography>
             <div style={{ display: "flex" }}>
-              <div style={{ width: "50%", marginRight: 10 }}>
+              <div style={{ width: "70%", marginRight: 10 }}>
                 <Typography
                   variant="subtitle1"
                   color="text.secondary"
@@ -99,7 +98,7 @@ const FoodDetail = () => {
                   <MenuBookIcon /> {foodDetail.menu_item.name}
                 </Typography>
               </div>
-              <div style={{ width: "80%", marginLeft: 10 }}>
+              <div style={{ width: "30%", marginLeft: 10 }}>
                 <Typography
                   variant="subtitle1"
                   color="text.secondary"
