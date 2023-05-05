@@ -17,6 +17,12 @@ import CartOrder from "./components/CartOrder";
 import ProfileUser from "./components/ProfileUser";
 import FoodDetail from "./components/FoodDetail";
 import StoreFeedback from "./components/StoreFeedback";
+
+import "moment/locale/vi";
+import moment from "moment";
+
+moment().local("vi");
+
 <link
   rel="stylesheet"
   href="https://fonts.googleapis.com/icon?family=Material+Icons"

@@ -153,6 +153,7 @@ const StoreManagement = () => {
 
   const [user] = useContext(UserContext);
   const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   const [dataTable, setDataTable] = useState([]);
   const [selectedMenuItem, setSelectedMenuItem] = useState(MAP_INDEX_MENU.MENU);
   const [menu, setMenu] = useState([]);
@@ -179,6 +180,20 @@ const StoreManagement = () => {
   });
   const image_food = useRef();
   const navigate = useNavigate();
+
+  // event click
+  const handleListItemClick = (type) => {
+    setSelectedMenuItem(type);
+  };
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  };
 
   const [openMess, setOpenMess] = useState(false);
 
@@ -212,18 +227,7 @@ const StoreManagement = () => {
     loadTags();
   }, []);
 
-  // event click
-  const handleListItemClick = (type) => {
-    setSelectedMenuItem(type);
-  };
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  // load store
+  //LOAD DATA TABLE BY SELECTEDITEM
   useEffect(() => {
     let loadData = async () => {
       // console.log("trigger refresher");
@@ -254,13 +258,15 @@ const StoreManagement = () => {
               url = "order-accepted";
             }
 
-            let temp_o = await authAPI().get(endpoints[url]);
+            let tempO = await authAPI().get(endpoints[url]);
+            console.log(tempO.data);
             res = {
-              data: temp_o.data.map((item) => {
-                const { paymentmethod = {}, ...restInfo } = item;
+              data: tempO.data.map((i) => {
+                const { paymentmethod = {}, ...restInfo } = i;
+                // console.log(paymentmethod);
                 return {
                   ...restInfo,
-                  paymentmethod_name: paymentmethod.name || "",
+                  paymentmethod_name: paymentmethod.name || "Tiền mặt",
                 };
               }),
             };
@@ -277,7 +283,7 @@ const StoreManagement = () => {
     loadData();
   }, [selectedMenuItem, refresher]);
 
-  // load form dialog
+  // load form ADD dialog
   const renderForm = (type) => {
     if (type === MAP_INDEX_MENU.MENU)
       return (
@@ -447,6 +453,87 @@ const StoreManagement = () => {
     }
   };
 
+  // addFood
+  const addFood = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      let form = new FormData();
+      form.append("name", formFood.name);
+      form.append("price", formFood.price);
+      form.append("description", formFood.description);
+      form.append("start_time", formFood.start_time);
+      form.append("end_time", formFood.end_time);
+      form.append("menu_item", formFood.menu_item);
+
+      const newTags = tagsValue.map((tag) => ({ id: tag.id }));
+      form.append("tags", JSON.stringify(newTags));
+
+      if (image_food.current.files.length > 0) {
+        form.append("image_food", image_food.current.files[0]);
+        let res = await authAPI().post(endpoints["food-store"], form, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        if (res.status === 201) {
+          setFormFood({
+            name: "",
+            price: "",
+            description: "",
+            start_time: "",
+            end_time: "",
+            menu_item: "",
+            image: "",
+          });
+          setTagsValue([]);
+          setRefresher((pre) => pre + 1);
+          setOpen(false);
+          setOpenMess(true);
+          setMess(res.data.message);
+          navigate("/store-management");
+        } else setErr("Hệ thống bị lỗi! Vui lòng quay lại sau");
+      }
+    } catch (ex) {
+      let e = "";
+      for (let d of Object.values(ex.response.data)) e += `${d} <br />`;
+
+      setErr(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // button ADD
+  const renderButtonAdd = (type) => {
+    if (type === MAP_INDEX_MENU.MENU)
+      return (
+        <LoadingButton
+          loading={loading}
+          loadingPosition="start"
+          startIcon={<SaveIcon />}
+          variant="outlined"
+          onClick={addMenu}
+        >
+          Thêm menu
+        </LoadingButton>
+      );
+    else {
+      return (
+        <LoadingButton
+          loading={loading}
+          loadingPosition="start"
+          startIcon={<SaveIcon />}
+          variant="outlined"
+          onClick={addFood}
+          style={{ marginRight: 25 }}
+        >
+          Thêm món ăn
+        </LoadingButton>
+      );
+    }
+  };
+
   // ACTION MENU (EDIT, DELETE, CHANGE_STATUS)
   const handleActionMenu = async (type, data) => {
     try {
@@ -510,87 +597,6 @@ const StoreManagement = () => {
     }
   };
 
-  // addFood
-  const addFood = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      let form = new FormData();
-      form.append("name", formFood.name);
-      form.append("price", formFood.price);
-      form.append("description", formFood.description);
-      form.append("start_time", formFood.start_time);
-      form.append("end_time", formFood.end_time);
-      form.append("menu_item", formFood.menu_item);
-
-      const newTags = tagsValue.map((tag) => ({ id: tag.id }));
-      form.append("tags", JSON.stringify(newTags));
-
-      if (image_food.current.files.length > 0) {
-        form.append("image_food", image_food.current.files[0]);
-        let res = await authAPI().post(endpoints["food-store"], form, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        if (res.status === 201) {
-          setFormFood({
-            name: "",
-            price: "",
-            description: "",
-            start_time: "",
-            end_time: "",
-            menu_item: "",
-            image: "",
-          });
-          setTagsValue([]);
-          setRefresher((pre) => pre + 1);
-          setOpen(false);
-          setOpenMess(true);
-          setMess(res.data.message);
-          navigate("/store-management");
-        } else setErr("Hệ thống bị lỗi! Vui lòng quay lại sau");
-      }
-    } catch (ex) {
-      let e = "";
-      for (let d of Object.values(ex.response.data)) e += `${d} <br />`;
-
-      setErr(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // button
-  const renderButtonAdd = (type) => {
-    if (type === MAP_INDEX_MENU.MENU)
-      return (
-        <LoadingButton
-          loading={loading}
-          loadingPosition="start"
-          startIcon={<SaveIcon />}
-          variant="outlined"
-          onClick={addMenu}
-        >
-          Thêm menu
-        </LoadingButton>
-      );
-    else {
-      return (
-        <LoadingButton
-          loading={loading}
-          loadingPosition="start"
-          startIcon={<SaveIcon />}
-          variant="outlined"
-          onClick={addFood}
-          style={{ marginRight: 25 }}
-        >
-          Thêm món ăn
-        </LoadingButton>
-      );
-    }
-  };
-
   // check columns theo selectedMenuItem
   const columns = useMemo(() => {
     switch (selectedMenuItem) {
@@ -624,6 +630,7 @@ const StoreManagement = () => {
       </Alert>
     );
 
+  // =====CODE UI====
   return (
     <>
       <div>

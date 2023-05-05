@@ -33,6 +33,7 @@ export const ACTION_TYPES_V1 = {
   DELETE: "delete",
 };
 
+//BEGIN CODE DEFAULT
 const sample = [
   ["Frozen yoghurt", 159, 6.0, 24, 4.0],
   ["Ice cream sandwich", 237, 9.0, 37, 4.3],
@@ -99,6 +100,7 @@ const VirtuosoTableComponents = {
     <TableBody {...props} ref={ref} />
   )),
 };
+//END CODE DEFAULT
 
 export default function ReactVirtualizedTable(props) {
   const { columns = columnsDefault, rows = rowsDefault } = props;
@@ -133,24 +135,30 @@ export default function ReactVirtualizedTable(props) {
   const rowContent = (_index, row) => {
     const renderActive = (isActive) => {
       return isActive ? (
-        <CheckCircleIcon style={{ color: "green" }} />
+        <CheckCircleIcon style={{ color: "green", marginLeft: "35%" }} />
       ) : (
-        <RemoveCircleIcon style={{ color: "red" }} />
+        <RemoveCircleIcon style={{ color: "red", marginLeft: "35%" }} />
       );
     };
 
     const renderByStatus = (status) => {
-      if (status === 0) return <PendingActionsIcon style={{ color: "red" }} />;
-      if (status === 1) return <DeliveryDiningIcon color="warning" />;
+      if (status === 0)
+        return (
+          <PendingActionsIcon style={{ color: "red", marginRight: "35%" }} />
+        );
+      if (status === 1)
+        return (
+          <DeliveryDiningIcon color="warning" style={{ marginRight: "35%" }} />
+        );
 
-      return <CreditScoreIcon style={{ color: "green" }} />;
+      return <CreditScoreIcon style={{ color: "green", marginRight: "35%" }} />;
     };
 
     const renderCellByDataKey = (column, dataKey) => {
       if (column.numeric && dataKey !== "order_status") {
         return numberWithCommas(row[column.dataKey]);
       }
-
+      // SET TABLE ORDER CART
       if (dataKey === "quantity" && column.hasAction) {
         return (
           <div
@@ -187,7 +195,7 @@ export default function ReactVirtualizedTable(props) {
           </div>
         );
       }
-
+      // SET ICON - BUTTON MANAGEMENT
       switch (dataKey) {
         case "active":
         case "payment_status":
