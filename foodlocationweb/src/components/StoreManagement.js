@@ -155,6 +155,8 @@ const StoreManagement = () => {
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [dataTable, setDataTable] = useState([]);
+  const [isEditData, setIsEditData] = useState(false);
+  const [cacheEditId, setCacheEditId] = useState(null);
   const [selectedMenuItem, setSelectedMenuItem] = useState(MAP_INDEX_MENU.MENU);
   const [menu, setMenu] = useState([]);
   const [refresher, setRefresher] = useState(1);
@@ -285,7 +287,7 @@ const StoreManagement = () => {
 
   // load form ADD dialog
   const renderForm = (type) => {
-    if (type === MAP_INDEX_MENU.MENU)
+    if (type === MAP_INDEX_MENU.MENU) {
       return (
         <InputFormUser
           label="Tên danh mục"
@@ -300,6 +302,7 @@ const StoreManagement = () => {
           }}
         />
       );
+    }
 
     return (
       <>
@@ -453,6 +456,42 @@ const StoreManagement = () => {
     }
   };
 
+  const editMenu = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const params = {
+        ...formMenu,
+      };
+
+      let res = await authAPI().put(
+        endpoints["action-menu"](cacheEditId),
+        params
+      );
+      console.info(res);
+
+      if (res.status === 200) {
+        setRefresher((pre) => pre + 1);
+        setFormMenu({
+          name: "",
+        });
+        setCacheEditId(null);
+        setIsEditData(false);
+        setOpen(false);
+        setMess(res.data.message);
+        setOpenMess(true);
+        navigate("/store-management");
+      } else setErr("Hệ thống bị lỗi! Vui lòng quay lại sau");
+    } catch (ex) {
+      let e = "";
+      for (let d of Object.values(ex.response.data)) e += `${d} <br />`;
+
+      setErr(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // addFood
   const addFood = async (e) => {
     e.preventDefault();
@@ -504,9 +543,80 @@ const StoreManagement = () => {
     }
   };
 
+  const editFood = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      let form = new FormData();
+      form.append("name", formFood.name);
+      form.append("price", formFood.price);
+      form.append("description", formFood.description);
+      form.append("start_time", formFood.start_time);
+      form.append("end_time", formFood.end_time);
+      form.append("menu_item", formFood.menu_item);
+
+      const newTags = tagsValue.map((tag) => ({ id: tag.id }));
+      form.append("tags", JSON.stringify(newTags));
+
+      if (image_food.current.files.length > 0)
+        form.append("image_food", image_food.current.files[0]);
+
+      let res = await authAPI().put(
+        endpoints["action-food"](cacheEditId),
+        form,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (res.status === 200) {
+        setFormFood({
+          name: "",
+          price: "",
+          description: "",
+          start_time: "",
+          end_time: "",
+          menu_item: "",
+          image: "",
+        });
+        setCacheEditId(null);
+        setIsEditData(false);
+        setTagsValue([]);
+        setRefresher((pre) => pre + 1);
+        setOpen(false);
+        setOpenMess(true);
+        setMess(res.data.message);
+        navigate("/store-management");
+      } else setErr("Hệ thống bị lỗi! Vui lòng quay lại sau");
+    } catch (ex) {
+      let e = "";
+      for (let d of Object.values(ex.response.data)) e += `${d} <br />`;
+
+      setErr(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // button ADD
-  const renderButtonAdd = (type) => {
-    if (type === MAP_INDEX_MENU.MENU)
+  const renderButtonAdd = (type, isEdit) => {
+    if (isEdit) {
+      return (
+        <LoadingButton
+          loading={loading}
+          loadingPosition="start"
+          startIcon={<SaveIcon />}
+          variant="outlined"
+          onClick={type === MAP_INDEX_MENU.MENU ? editMenu : editFood}
+        >
+          {type === MAP_INDEX_MENU.MENU ? "Chỉnh sửa menu" : "Chỉnh sửa món ăn"}
+        </LoadingButton>
+      );
+    }
+
+    if (type === MAP_INDEX_MENU.MENU) {
       return (
         <LoadingButton
           loading={loading}
@@ -518,7 +628,7 @@ const StoreManagement = () => {
           Thêm menu
         </LoadingButton>
       );
-    else {
+    } else {
       return (
         <LoadingButton
           loading={loading}
@@ -545,7 +655,14 @@ const StoreManagement = () => {
         res = await authAPI().delete(endpoints["action-menu"](data.id));
       }
       if (type === ACTION_TYPES_V1.EDIT) {
-        res = await authAPI().put(endpoints["action-menu"](data.id));
+        setIsEditData(true);
+        setFormMenu({
+          ...formMenu,
+          name: data.name,
+        });
+        setCacheEditId(data.id);
+        setOpen(true);
+        return;
       }
 
       if (res && res.status === 200) {
@@ -569,7 +686,28 @@ const StoreManagement = () => {
         res = await authAPI().delete(endpoints["action-food"](data.id));
       }
       if (type === ACTION_TYPES_V1.EDIT) {
-        res = await authAPI().put(endpoints["action-food"](data.id));
+        console.log("data clicked :>", data);
+        let currentMenu;
+        if (menu) {
+          currentMenu = menu.find(
+            (menuItem) => menuItem.name === data.menu_name
+          );
+        }
+
+        setCacheEditId(data.id);
+        setFormFood({
+          ...formFood,
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          start_time: data.start_time,
+          end_time: data.end_time,
+          menu_item: currentMenu ? currentMenu.id : null,
+        });
+        setTagsValue(data.tags);
+        setIsEditData(true);
+        setOpen(true);
+        return;
       }
 
       if (res && res.status === 200) {
@@ -692,11 +830,11 @@ const StoreManagement = () => {
             minWidth: "400px",
           }}
         >
-          TẠO MỚI
+          {isEditData ? "Chỉnh sửa thông tin" : "TẠO MỚI"}
         </DialogTitle>
         <Divider color="gray" />
         <DialogContent style={{ minWidth: "400px" }}>
-          {renderForm(selectedMenuItem)}
+          {renderForm(selectedMenuItem, isEditData)}
         </DialogContent>
         <DialogActions>
           <Button
@@ -706,7 +844,7 @@ const StoreManagement = () => {
           >
             Hủy
           </Button>
-          {renderButtonAdd(selectedMenuItem)}
+          {renderButtonAdd(selectedMenuItem, isEditData)}
         </DialogActions>
       </Dialog>
     </>
