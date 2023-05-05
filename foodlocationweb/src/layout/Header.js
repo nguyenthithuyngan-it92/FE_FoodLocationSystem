@@ -22,7 +22,7 @@ import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
-import { Divider, ListItem, ListItemText } from "@mui/material";
+import { Divider, ListItem, ListItemText, Typography } from "@mui/material";
 import Moment from "react-moment";
 import { numberWithCommas } from "../utils/converters";
 
@@ -140,7 +140,8 @@ const Header = () => {
             <Menu
               style={{
                 height: "300px",
-                maxWidth: "400px",
+                maxWidth: "450px",
+                whiteSpace: "wrap",
               }}
               id="basic-menu"
               anchorEl={anchorE2}
@@ -156,7 +157,11 @@ const Header = () => {
                     <div>
                       <ListItem style={{ padding: 0 }}>
                         <ListItemText
-                          style={{ display: "flex" }}
+                          style={{
+                            display: "flex",
+                            height: "auto",
+                            whiteSpace: "wrap",
+                          }}
                           secondary={
                             <PendingActionsIcon
                               style={{
@@ -178,11 +183,20 @@ const Header = () => {
                           <Moment fromNow>{o.created_date}</Moment>
                         </caption>
                       </ListItem>
-                      <caption style={{ display: "block", padding: 5 }}>
-                        Bạn vừa đặt thành công đơn hàng với tổng tiền{" "}
+                      <Typography
+                        color="text.secondary"
+                        variant="body2"
+                        style={{
+                          width: "350px",
+                          marginBottom: 10,
+                          height: "auto",
+                          whiteSpace: "break-spaces",
+                        }}
+                      >
+                        Bạn đã đặt thành công đơn hàng với tổng tiền{" "}
                         {numberWithCommas(o.amount)} VNĐ vào lúc{" "}
                         <Moment fromNow>{o.created_date}</Moment>{" "}
-                      </caption>
+                      </Typography>
                       <Divider component="li" />
                     </div>
                   ) : null}
@@ -190,7 +204,11 @@ const Header = () => {
                     <div>
                       <ListItem style={{ padding: 0 }}>
                         <ListItemText
-                          style={{ display: "flex" }}
+                          style={{
+                            display: "flex",
+                            height: "auto",
+                            whiteSpace: "wrap",
+                          }}
                           secondary={
                             <DeliveryDiningIcon
                               style={{
@@ -209,13 +227,22 @@ const Header = () => {
                             marginLeft: 5,
                           }}
                         >
-                          <Moment fromNow>{o.created_date}</Moment>
+                          <Moment fromNow>{o.payment_date}</Moment>
                         </caption>
                       </ListItem>
-                      <caption style={{ display: "block", padding: 5 }}>
+                      <Typography
+                        color="text.secondary"
+                        variant="body2"
+                        style={{
+                          width: "350px",
+                          marginBottom: 10,
+                          height: "auto",
+                          whiteSpace: "break-spaces",
+                        }}
+                      >
                         Đơn hàng có tổng tiền {numberWithCommas(o.amount)} VNĐ
                         đang được giao đến bạn!
-                      </caption>
+                      </Typography>
                       <Divider component="li" />
                     </div>
                   ) : null}
@@ -223,7 +250,11 @@ const Header = () => {
                     <div>
                       <ListItem style={{ padding: 0 }}>
                         <ListItemText
-                          style={{ display: "flex" }}
+                          style={{
+                            display: "flex",
+                            height: "auto",
+                            whiteSpace: "wrap",
+                          }}
                           secondary={
                             <CreditScoreIcon
                               style={{
@@ -245,11 +276,20 @@ const Header = () => {
                           <Moment fromNow>{o.created_date}</Moment>
                         </caption>
                       </ListItem>
-                      <caption style={{ display: "block", padding: 5 }}>
+                      <Typography
+                        color="text.secondary"
+                        variant="body2"
+                        style={{
+                          width: "350px",
+                          marginBottom: 10,
+                          height: "auto",
+                          whiteSpace: "break-spaces",
+                        }}
+                      >
                         Đơn hàng có tổng tiền {numberWithCommas(o.amount)} VNĐ
                         của bạn đã được giao vào{" "}
                         <Moment fromNow>{o.payment_date}</Moment>{" "}
-                      </caption>
+                      </Typography>
                       <Divider component="li" />
                     </div>
                   ) : null}
