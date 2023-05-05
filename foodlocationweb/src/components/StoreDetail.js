@@ -1,4 +1,3 @@
-import InfoStore from "../layout/InfoStore";
 import { useContext, useState, useEffect, Fragment } from "react";
 import Loading from "../layout/Loading";
 import API, { endpoints } from "../configs/API";
