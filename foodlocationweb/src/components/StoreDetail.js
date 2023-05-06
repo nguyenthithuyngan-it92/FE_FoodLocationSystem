@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, Fragment } from "react";
+import React, { useContext, useState, useEffect, Fragment } from "react";
 import Loading from "../layout/Loading";
 import API, { endpoints } from "../configs/API";
 import { Link, useParams } from "react-router-dom";
@@ -34,9 +34,22 @@ import { Tooltip } from "@mui/material";
 import { UserContext } from "../configs/MyContext";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 
+import Dialog from "@mui/material/Dialog";
+import Button from "@mui/material/Button";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import Slide from "@mui/material/Slide";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 const StoreDetail = () => {
   const [user] = useContext(UserContext);
-
+  const [open, setOpen] = useState(false);
+  const [cacheFood, setCacheFood] = useState(null);
   const [menuItem, setMenuItem] = useState([]);
   const [countCart, setCountCart] = useState(0);
   const [listCart, setListCart] = useState([]);
@@ -91,9 +104,22 @@ const StoreDetail = () => {
     loadFoodDetail();
   }, [foodId]);
 
-  const handleAddToCart = (item) => {
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleAddToCart = (item, isForceSave = false) => {
     const key = `cart-${user.id}`;
+    if (isForceSave) {
+      localStorage.removeItem(key);
+    }
+
     const itemStorage = localStorage.getItem(key);
+    // console.log("itemStorage :>", itemStorage);
     const temp = [
       {
         ...item,
@@ -106,35 +132,48 @@ const StoreDetail = () => {
     if (!itemStorage) {
       localStorage.setItem(key, JSON.stringify(temp));
       setListCart(temp);
+
+      // For case choose food different store
+      if (isForceSave) {
+        setOpen(false);
+      }
     } else {
       const itemParse = JSON.parse(itemStorage);
-      const itemExisted = itemParse.findIndex(
-        (cartItem) => cartItem.id === item.id
-      );
+      const storeIdExisted = itemParse[0].store_id;
 
-      if (itemExisted === -1) {
-        itemParse.push({
-          ...item,
-          user_id: user.id,
-          store_id: parseInt(storeId),
-          quantity: 1,
-        });
-        localStorage.setItem(key, JSON.stringify(itemParse));
-        setListCart(itemParse);
+      // console.log("itemParse :>", itemParse);
+      if (storeIdExisted !== parseInt(storeId)) {
+        setCacheFood(item);
+        handleClickOpen();
       } else {
-        const temp = itemParse.map((cart) => {
-          if (cart.id === item.id) {
-            return {
-              ...cart,
-              quantity: cart.quantity + 1,
-            };
-          }
+        const itemExisted = itemParse.findIndex(
+          (cartItem) => cartItem.id === item.id
+        );
 
-          return cart;
-        });
+        if (itemExisted === -1) {
+          itemParse.push({
+            ...item,
+            user_id: user.id,
+            store_id: parseInt(storeId),
+            quantity: 1,
+          });
+          localStorage.setItem(key, JSON.stringify(itemParse));
+          setListCart(itemParse);
+        } else {
+          const temp = itemParse.map((cart) => {
+            if (cart.id === item.id) {
+              return {
+                ...cart,
+                quantity: cart.quantity + 1,
+              };
+            }
 
-        localStorage.setItem(key, JSON.stringify(temp));
-        setListCart(temp);
+            return cart;
+          });
+
+          localStorage.setItem(key, JSON.stringify(temp));
+          setListCart(temp);
+        }
       }
     }
   };
@@ -322,6 +361,29 @@ const StoreDetail = () => {
       </div>
       {/* cart */}
       <CustomizedBadges count={countCart} />
+
+      {/* DIALOG THÔNG BÁO ADD CART */}
+      <Dialog
+        open={open}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleClose}
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle>Cảnh báo</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            Trong giỏ hàng đã có món ăn của cửa hàng khác. Bạn có muốn xóa những
+            món trong giỏ hàng không?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Tắt thông báo</Button>
+          <Button onClick={() => handleAddToCart(cacheFood, true)}>
+            Đồng ý
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
