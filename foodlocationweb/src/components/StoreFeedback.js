@@ -14,11 +14,13 @@ import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import IconButton from "@mui/material/IconButton";
 import TableChartIcon from "@mui/icons-material/TableChart";
+import Map, { apiKey } from "./Map";
 
 const StoreFeedback = () => {
   const [user] = useContext(UserContext);
   const [store, setStore] = useState(null);
   const { storeId } = useParams();
+  const [locationCenter, setLocationCenter] = useState({});
   const [countFollower, setCountFollower] = useState(0);
 
   useEffect(() => {
@@ -42,6 +44,39 @@ const StoreFeedback = () => {
 
     loadCountFollower();
   }, [storeId]);
+
+  // Get location
+  useEffect(() => {
+    if (store && store.address) {
+      handleGetLocation(store.address);
+    }
+  }, [store]);
+
+  const handleGetLocation = async (address) => {
+    try {
+      const res = await API.get(endpoints["get-location"](address));
+
+      if (
+        res.status === 200 &&
+        Array.isArray(res.data) &&
+        res.data.length > 0
+      ) {
+        const { lat, lon } = res.data[0];
+        setLocationCenter({
+          center: {
+            lat: Number(lat),
+            lng: Number(lon),
+          },
+          position: {
+            lat: Number(lat),
+            lng: Number(lon),
+          },
+        });
+      }
+    } catch (err) {
+      console.log("err :>", err);
+    }
+  };
 
   if (store === null) return <Loading />;
 
@@ -75,7 +110,7 @@ const StoreFeedback = () => {
               variant="subtitle1"
               color="text.secondary"
               component="div"
-              sx={{ flex: "1 0 auto", marginTop: "10px" }}
+              sx={{ flex: "1 0 auto", marginTop: "10px", maxWidth: 365 }}
             >
               <LocationOnIcon /> {store.address}
             </Typography>
@@ -118,6 +153,9 @@ const StoreFeedback = () => {
               </Typography>
             )}
           </Box>
+        </Box>
+        <Box sx={{ width: 380, height: 200, margin: "10px" }}>
+          <Map location={locationCenter} />
         </Box>
       </Card>
       <div

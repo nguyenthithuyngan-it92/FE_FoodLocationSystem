@@ -194,8 +194,8 @@ const Header = () => {
                         }}
                       >
                         Bạn đã đặt thành công đơn hàng với tổng tiền{" "}
-                        {numberWithCommas(o.amount)} VNĐ vào lúc{" "}
-                        <Moment fromNow>{o.created_date}</Moment>{" "}
+                        {numberWithCommas(o.amount)} VNĐ, sẽ được giao cho{" "}
+                        {o.receiver_name} tại địa chỉ {o.receiver_address}.
                       </Typography>
                       <Divider component="li" />
                     </div>
@@ -241,7 +241,7 @@ const Header = () => {
                         }}
                       >
                         Đơn hàng có tổng tiền {numberWithCommas(o.amount)} VNĐ
-                        đang được giao đến bạn!
+                        đang được giao đến bạn tại địa chỉ {o.receiver_address}!
                       </Typography>
                       <Divider component="li" />
                     </div>
@@ -273,7 +273,7 @@ const Header = () => {
                             marginLeft: 5,
                           }}
                         >
-                          <Moment fromNow>{o.created_date}</Moment>
+                          <Moment fromNow>{o.payment_date}</Moment>
                         </caption>
                       </ListItem>
                       <Typography
@@ -287,8 +287,9 @@ const Header = () => {
                         }}
                       >
                         Đơn hàng có tổng tiền {numberWithCommas(o.amount)} VNĐ
-                        của bạn đã được giao vào{" "}
-                        <Moment fromNow>{o.payment_date}</Moment>{" "}
+                        của bạn đã được giao vào lúc{" "}
+                        <Moment fromNow>{o.payment_date}</Moment> tại{" "}
+                        {o.receiver_address}.
                       </Typography>
                       <Divider component="li" />
                     </div>

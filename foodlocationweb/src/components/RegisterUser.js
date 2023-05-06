@@ -57,7 +57,11 @@ const RegisterUser = () => {
     if (user.username === "" || user.password === "")
       setErr("Username hoặc password phải nhập!");
     else if (user.password !== user.confirmPassword)
-      setErr("Mật khẩu KHÔNG khớp!");
+      setErr("Mật khẩu xác nhận không khớp!");
+    else if (avatar.current.files.length === 0)
+      setErr("Phải chọn ảnh đại diện!");
+    else if (user.firstName === "" || user.lastName === "")
+      setErr("Phải nhập họ và tên!");
     else {
       setLoading(true);
       process();
