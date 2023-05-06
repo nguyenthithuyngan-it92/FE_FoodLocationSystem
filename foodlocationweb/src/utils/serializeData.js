@@ -19,3 +19,20 @@ export const dataFoodToFE = (foodList = []) => {
 
   return result;
 };
+
+export const buildExtraDataToAPI = (data = {}) => {
+  const str = Object.entries(data)
+    .map(([key, value]) => `${key}=${value}`)
+    .join(";");
+
+  return str;
+};
+
+export const deserializerData = (keyValuePairs = "") => {
+  const result = keyValuePairs
+    .split(";")
+    .map((pair) => pair.split("="))
+    .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {});
+
+  return result;
+};

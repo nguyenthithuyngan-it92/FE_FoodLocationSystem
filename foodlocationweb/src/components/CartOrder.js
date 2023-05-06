@@ -12,13 +12,21 @@ import {
 } from "@mui/material";
 import { FormLabel } from "react-bootstrap";
 import API, { authAPI, endpoints } from "../configs/API";
-import { Navigate, useNavigate } from "react-router-dom";
+import {
+  Navigate,
+  useNavigate,
+  redirect,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { UserContext } from "../configs/MyContext";
 import { numberWithCommas } from "../utils/converters";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SaveIcon from "@mui/icons-material/Save";
+import { buildExtraDataToAPI, deserializerData } from "../utils/serializeData";
 
 const FEE = 15000;
+const MOMO = 2;
 
 const CartOrder = () => {
   const [user] = useContext(UserContext);
@@ -34,6 +42,7 @@ const CartOrder = () => {
     paymentmethod: "",
   });
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [mess, setMess] = useState(null);
   const [openMess, setOpenMess] = useState(false);
 
@@ -87,6 +96,75 @@ const CartOrder = () => {
     localStorage.setItem(key, JSON.stringify(results));
   };
 
+  useEffect(() => {
+    const orderId = searchParams.get("orderId");
+    const totalTemp = searchParams.get("amount");
+    const responseCode = searchParams.get("resultCode");
+
+    if (orderId) {
+      const extraData = searchParams.get("extraData");
+      const newExtraData = deserializerData(extraData);
+      const {
+        order_details,
+        delivery_fee,
+        payment_status,
+        paymentmethod,
+        receiver_address,
+        receiver_name,
+        receiver_phone,
+        store,
+        user,
+      } = newExtraData;
+
+      if (Number(responseCode) !== 1006) {
+        try {
+          (async function () {
+            const params = {
+              receiver_address,
+              receiver_name,
+              receiver_phone,
+              amount: totalTemp,
+              payment_status: true,
+              paymentmethod: Number(paymentmethod),
+              delivery_fee: parseFloat(delivery_fee),
+              user: Number(user),
+              order_details: JSON.parse(order_details),
+              store: Number(store),
+            };
+
+            const res = await authAPI().post(endpoints["orders"], params);
+
+            if (res.status === 201) {
+              setFormOrder({
+                receiver_name: "",
+                receiver_phone: "",
+                receiver_address: "",
+                delivery_fee: FEE,
+                paymentmethod: "",
+              });
+              setListCart([]);
+              localStorage.removeItem(`cart-${user.id}`);
+              navigate("/");
+            }
+          })();
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        setFormOrder({
+          receiver_name,
+          paymentmethod: Number(paymentmethod),
+          receiver_address,
+          receiver_phone,
+          delivery_fee,
+        });
+        setListCart(JSON.parse(localStorage.getItem(`cart-${user.id}`)));
+        setMess("Bạn chưa thanh toán hóa đơn! Đơn hàng chưa được đặt!");
+        setOpenMess(true);
+      }
+    }
+  }, []);
+
   // set total amount
   useEffect(() => {
     // console.log(listCart);
@@ -129,6 +207,8 @@ const CartOrder = () => {
 
     try {
       let storeId = null;
+      const paymentmethod = formOrder.paymentmethod;
+
       const orderDetails = listCart.map((item) => {
         storeId = item.store_id;
 
@@ -141,14 +221,37 @@ const CartOrder = () => {
 
       const params = {
         ...formOrder,
-        payment_status: false,
+        payment_status: paymentmethod === MOMO ? true : false,
         amount: total,
         user: user.id,
         order_details: orderDetails,
         store: storeId,
       };
 
-      let res = await authAPI().post(endpoints["orders"], params);
+      let res;
+
+      if (Number(paymentmethod) === MOMO) {
+        const extraData = buildExtraDataToAPI({
+          ...params,
+          order_details: JSON.stringify(orderDetails),
+        });
+
+        res = await authAPI().post(endpoints["payMomo"], {
+          orderInfo: `Khách hàng: ${formOrder.receiver_name} - ${formOrder.receiver_phone}`,
+          amount: `${total}`,
+          redirectUrl: "http://localhost:3000/cart",
+          ipnUrl: "http://localhost:3000/cart",
+          extraData,
+        });
+
+        if (res.status === 200) {
+          const payURL = res.data.data.payURL;
+          window.location.href = payURL;
+        }
+        return;
+      } else {
+        res = await authAPI().post(endpoints["orders"], params);
+      }
 
       if (res.status === 201) {
         setFormOrder({

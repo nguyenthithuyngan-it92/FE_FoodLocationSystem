@@ -10,6 +10,7 @@ export const endpoints = {
   user: "/users/",
   "menu-items": "/menu-items/",
   orders: "/orders/",
+  payMomo: "/create_payment/",
   login: "/o/token/",
   "current-user": "/users/current-user/",
   register: "/users/", //create user
