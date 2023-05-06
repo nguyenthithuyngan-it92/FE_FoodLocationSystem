@@ -64,8 +64,13 @@ const RegisterStore = () => {
     if (user.username === "" || user.password === "")
       setErr("Username hoặc password phải nhập!");
     else if (user.password !== user.confirmPassword)
-      setErr("Mật khẩu KHÔNG khớp!");
+      setErr("Mật khẩu xác nhận không khớp!");
     else if (user.name_store === "") setErr("Phải nhập tên cửa hàng!");
+    else if (user.address === "") setErr("Phải nhập địa chỉ cửa hàng!");
+    else if (avatar.current.files.length === 0)
+      setErr("Phải chọn ảnh đại diện cho cửa hàng!");
+    else if (user.firstName === "" || user.lastName === "")
+      setErr("Phải nhập họ và tên!");
     else {
       setLoading(true);
       process();

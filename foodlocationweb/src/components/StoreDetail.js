@@ -299,7 +299,9 @@ const StoreDetail = () => {
 
       {/* DANH SÁCH MENU CỦA STORE */}
       <div style={{ display: "flex" }}>
+        {/* list menu by store */}
         <MenuItem />
+        {/* list food by store */}
         <List sx={{ flex: 1, overflow: "hidden", bgcolor: "background.paper" }}>
           {menuItem.map((item) => {
             return (
@@ -318,6 +320,7 @@ const StoreDetail = () => {
           })}
         </List>
       </div>
+      {/* cart */}
       <CustomizedBadges count={countCart} />
     </>
   );

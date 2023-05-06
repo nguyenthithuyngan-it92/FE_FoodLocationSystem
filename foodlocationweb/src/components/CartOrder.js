@@ -59,6 +59,7 @@ const CartOrder = () => {
     },
   ];
 
+  // SET QUANTITY FOOD
   const handleActionCart = (type, data) => {
     // console.log({ type, data });
     const key = `cart-${user.id}`;
@@ -86,6 +87,7 @@ const CartOrder = () => {
     localStorage.setItem(key, JSON.stringify(results));
   };
 
+  // set total amount
   useEffect(() => {
     // console.log(listCart);
     if (user) {
@@ -98,6 +100,7 @@ const CartOrder = () => {
     }
   }, [listCart]);
 
+  // check user load cart
   useEffect(() => {
     if (user) {
       setListCart(JSON.parse(localStorage.getItem(`cart-${user.id}`)) || []);
@@ -119,6 +122,7 @@ const CartOrder = () => {
     loadPayments();
   }, []);
 
+  // ADD ORDER
   const addOrder = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -166,125 +170,137 @@ const CartOrder = () => {
     }
   };
 
-  if (!user) return <Navigate to="/login" replace={true} />;
+  // if (!user) return <Navigate to="/login" replace={true} />;
 
   return (
     <>
-      {/* MESSAGE */}
-      <Snackbar
-        open={openMess}
-        autoHideDuration={6000}
-        onClose={handleCloseMess}
-      >
-        <Alert severity="error" onClose={handleCloseMess}>
-          <AlertTitle>Lỗi đặt món</AlertTitle>
-          {mess}
-        </Alert>
-      </Snackbar>
-      <div style={{ border: "1px solid", margin: 10, borderRadius: 5 }}>
-        <h6 style={{ margin: 10, color: "gray" }}>Thông tin món ăn được đặt</h6>
-        <ReactVirtualizedTable columns={columnsCart} rows={listCart} />
-        <div
-          style={{
-            padding: 12,
-            fontWeight: "bold",
-            color: "Highlight",
-          }}
-        >
-          Tổng tiền:
-          <span style={{ fontSize: "20px", fontStyle: "italic", margin: 5 }}>
-            {listCart.length === 0 ? 0 : numberWithCommas(total)}
-          </span>
-          VNĐ
-        </div>
-      </div>
-      <Divider color="gray" />
-      <div style={{ border: "1px solid", margin: 10, borderRadius: 5 }}>
-        <h6 style={{ margin: 10, color: "gray" }}>Thông tin giao hàng</h6>
-        <div style={{ margin: 10, display: "flex" }}>
-          <div style={{ width: "50%", margin: 10 }}>
-            <InputFormUser
-              label="Tên người nhận"
-              type="text"
-              value={formOrder.receiver_name}
-              controlId="rn"
-              setValue={(e) => {
-                setFormOrder({
-                  ...formOrder,
-                  receiver_name: e.target.value,
-                });
-              }}
-            />
-            <InputFormUser
-              label="Số điện thoại người nhận"
-              type="number"
-              value={formOrder.receiver_phone}
-              controlId="phone"
-              setValue={(e) => {
-                setFormOrder({
-                  ...formOrder,
-                  receiver_phone: e.target.value,
-                });
-              }}
-            />
-            <InputFormUser
-              label="Địa chỉ nhận hàng"
-              type="text"
-              value={formOrder.receiver_address}
-              controlId="address"
-              setValue={(e) => {
-                setFormOrder({
-                  ...formOrder,
-                  receiver_address: e.target.value,
-                });
-              }}
-            />
-          </div>
-          <div style={{ width: "50%", margin: 10 }}>
-            <InputFormUser
-              disabled
-              label="Phí giao hàng"
-              type="number"
-              value={FEE}
-              controlId="fee"
-            />
-            <FormControl fullWidth>
-              <FormLabel>Phương thức thanh toán</FormLabel>
-              <Select
-                onChange={(e) => {
-                  setFormOrder({
-                    ...formOrder,
-                    paymentmethod: e.target.value,
-                  });
-                }}
-                value={formOrder.paymentmethod}
-                displayEmpty
-                style={{ height: 37 }}
-              >
-                {payment.map((p) => (
-                  <MenuItem value={p.id}>{p.name}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+      {!user || user.user_role == 0 ? (
+        <div>
+          {/* MESSAGE */}
+          <Snackbar
+            open={openMess}
+            autoHideDuration={6000}
+            onClose={handleCloseMess}
+          >
+            <Alert severity="error" onClose={handleCloseMess}>
+              <AlertTitle>Lỗi đặt món</AlertTitle>
+              {mess}
+            </Alert>
+          </Snackbar>
+          <div style={{ border: "1px solid", margin: 10, borderRadius: 5 }}>
+            <h6 style={{ margin: 10, color: "gray" }}>
+              Thông tin món ăn được đặt
+            </h6>
+            <ReactVirtualizedTable columns={columnsCart} rows={listCart} />
             <div
               style={{
                 padding: 12,
-                marginLeft: "280px",
+                fontWeight: "bold",
+                color: "Highlight",
               }}
             >
-              <LoadingButton
-                loading={loading}
-                loadingPosition="start"
-                startIcon={<SaveIcon />}
-                variant="outlined"
-                onClick={addOrder}
+              Tổng tiền:
+              <span
+                style={{ fontSize: "20px", fontStyle: "italic", margin: 5 }}
               >
-                Đặt món
-              </LoadingButton>
+                {listCart.length === 0 ? 0 : numberWithCommas(total)}
+              </span>
+              VNĐ
+            </div>
+          </div>
+          <Divider color="gray" />
+          <div style={{ border: "1px solid", margin: 10, borderRadius: 5 }}>
+            <h6 style={{ margin: 10, color: "gray" }}>Thông tin giao hàng</h6>
+            <div style={{ margin: 10, display: "flex" }}>
+              <div style={{ width: "50%", margin: 10 }}>
+                <InputFormUser
+                  label="Tên người nhận"
+                  type="text"
+                  value={formOrder.receiver_name}
+                  controlId="rn"
+                  setValue={(e) => {
+                    setFormOrder({
+                      ...formOrder,
+                      receiver_name: e.target.value,
+                    });
+                  }}
+                />
+                <InputFormUser
+                  label="Số điện thoại người nhận"
+                  type="number"
+                  value={formOrder.receiver_phone}
+                  controlId="phone"
+                  setValue={(e) => {
+                    setFormOrder({
+                      ...formOrder,
+                      receiver_phone: e.target.value,
+                    });
+                  }}
+                />
+                <InputFormUser
+                  label="Địa chỉ nhận hàng"
+                  type="text"
+                  value={formOrder.receiver_address}
+                  controlId="address"
+                  setValue={(e) => {
+                    setFormOrder({
+                      ...formOrder,
+                      receiver_address: e.target.value,
+                    });
+                  }}
+                />
+              </div>
+              <div style={{ width: "50%", margin: 10 }}>
+                <InputFormUser
+                  disabled
+                  label="Phí giao hàng"
+                  type="number"
+                  value={FEE}
+                  controlId="fee"
+                />
+                <FormControl fullWidth>
+                  <FormLabel>Phương thức thanh toán</FormLabel>
+                  <Select
+                    onChange={(e) => {
+                      setFormOrder({
+                        ...formOrder,
+                        paymentmethod: e.target.value,
+                      });
+                    }}
+                    value={formOrder.paymentmethod}
+                    displayEmpty
+                    style={{ height: 37 }}
+                  >
+                    {payment.map((p) => (
+                      <MenuItem value={p.id}>{p.name}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <div
+                  style={{
+                    padding: 12,
+                    marginLeft: "280px",
+                  }}
+                >
+                  <LoadingButton
+                    loading={loading}
+                    loadingPosition="start"
+                    startIcon={<SaveIcon />}
+                    variant="outlined"
+                    onClick={addOrder}
+                  >
+                    Đặt món
+                  </LoadingButton>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <Alert severity="warning" style={{ margin: 5 }}>
+          Vui lòng đăng nhập bằng tài khoản khách hàng để thực hiện đặt món!
+        </Alert>
+      )}
     </>
   );
 };
