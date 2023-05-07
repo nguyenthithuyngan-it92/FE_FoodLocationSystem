@@ -682,7 +682,7 @@ const StoreManagement = () => {
     }
   };
 
-  // ACTION MENU (EDIT, DELETE, CHANGE_STATUS)
+  // ACTION DIALOG CONFIRM (DELETE, CHANGE_STATUS)
   const handleActionConfirm = async () => {
     try {
       let res;
@@ -796,22 +796,6 @@ const StoreManagement = () => {
     }
   };
 
-  // SET ORDER_STATUS
-  const handleConfirmOrder = async (data) => {
-    try {
-      let res = await authAPI().post(endpoints["confirm-order"](data.id));
-      if (res && res.status === 200) {
-        setMess(res.data.message);
-        setOpenMess(true);
-        setRefresher((pre) => pre + 1);
-      }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // check columns theo selectedMenuItem
   const columns = useMemo(() => {
     switch (selectedMenuItem) {
@@ -851,7 +835,7 @@ const StoreManagement = () => {
       <div>
         {/* INFO STORE */} <InfoStore />
         {/* CHỨC NĂNG QUẢN LÝ */}
-        {user.is_verify === 1 ? (
+        {Number(user.is_verify) === 1 ? (
           <div style={{ display: "flex", gap: "15px" }}>
             {/* DANH SÁCH CHỨC NĂNG */}
             <FuncStore

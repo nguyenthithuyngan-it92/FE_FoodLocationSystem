@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
-import API, { endpoints } from '../configs/API';
-import { Link } from 'react-router-dom';
-import styled from '@emotion/styled';
+import React, { useEffect, useState } from "react";
+import { Button, Col, Container, Row } from "react-bootstrap";
+import API, { endpoints } from "../configs/API";
+import { Link } from "react-router-dom";
+import styled from "@emotion/styled";
+import Foods from "./Foods";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 
 const Home = () => {
-  const [tags, setTags] = useState([])
-
+  const [tags, setTags] = useState([]);
 
   useEffect(() => {
     const loadTags = async () => {
-      let res = await API.get(endpoints['tags']);
+      let res = await API.get(endpoints["tags"]);
       console.log(res.data.results);
       setTags(res.data.results);
     };
@@ -18,29 +21,43 @@ const Home = () => {
     loadTags();
   }, []);
   return (
-    <div className='home'>
+    <div className="home">
       <Container fluid className="banner">
         <Row>
           <Col>
             <div>
-              <h1>Đặt món online tại TN & KN </h1>
-              <h4>Giao hàng tận nơi</h4>
-              {tags.map(t => {
-                let url = `/food/?tagId=${t.id}`
-                return (
-                  <Button style={{width: 100, fontWeight: "bold"}} key={t.id} className="btn btn-link">
-                    <Link to={url} className="text-decoration-none">{t.name}</Link>
-                  </Button>
-                  )
+              <div
+                style={{
+                  border: "1px solid",
+                  borderColor: "gray",
+                  borderRadius: "5px",
+                  marginTop: "20px",
+                  marginBottom: "20px",
+                  display: "flex",
+                  padding: 5,
+                }}
+              >
+                {tags.map((t) => {
+                  // let url = `/food/?tagId=${t.id}`;
+                  return (
+                    <Stack direction="row" spacing={2}>
+                      <Chip
+                        label={t.name}
+                        icon={<LocalOfferIcon />}
+                        variant="outlined"
+                        style={{ padding: 5, margin: 10 }}
+                      />
+                    </Stack>
+                  );
                 })}
+              </div>
             </div>
           </Col>
-          <Col>2 of 2</Col>
         </Row>
-
+        <Foods />
       </Container>
     </div>
   );
-}
+};
 
 export default Home;

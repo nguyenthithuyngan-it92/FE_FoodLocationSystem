@@ -17,7 +17,9 @@ import Divider from "@mui/material/Divider";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import StackedLineChartIcon from "@mui/icons-material/StackedLineChart";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export const MAP_INDEX_MENU = {
   MENU: 1,
@@ -154,30 +156,59 @@ const FuncStore = (props) => {
           {openS ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
         <Collapse in={openS} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            <ListItemButton
-              selected={props.selectedMenuItem === MAP_INDEX_MENU.STATS_FOOD}
-              onClick={() => props.onClickListItem(MAP_INDEX_MENU.STATS_FOOD)}
-              sx={{ pl: 4 }}
-            >
-              <ListItemIcon>
-                <BarChartIcon />
-              </ListItemIcon>
-              <ListItemText primary="Doanh thu món ăn" />
-            </ListItemButton>
-          </List>
-          <List component="div" disablePadding>
-            <ListItemButton
-              selected={props.selectedMenuItem === MAP_INDEX_MENU.STATS_MENU}
-              onClick={() => props.onClickListItem(MAP_INDEX_MENU.STATS_MENU)}
-              sx={{ pl: 4 }}
-            >
-              <ListItemIcon>
-                <DonutSmallIcon />
-              </ListItemIcon>
-              <ListItemText primary="Danh mục món ăn" />
-            </ListItemButton>
-          </List>
+          <Link
+            to="/revenue-stats-month"
+            style={{ textDecoration: "none", color: "gray" }}
+          >
+            <List component="div" disablePadding>
+              <ListItemButton
+                selected={props.selectedMenuItem === MAP_INDEX_MENU.STATS_FOOD}
+                onClick={() => props.onClickListItem(MAP_INDEX_MENU.STATS_FOOD)}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon>
+                  <BarChartIcon />
+                </ListItemIcon>
+                <ListItemText primary="Doanh thu theo tháng" />
+              </ListItemButton>
+            </List>
+          </Link>
+
+          <Link
+            to="/revenue-stats-quarter"
+            style={{ textDecoration: "none", color: "gray" }}
+          >
+            <List component="div" disablePadding>
+              <ListItemButton
+                selected={props.selectedMenuItem === MAP_INDEX_MENU.STATS_MENU}
+                onClick={() => props.onClickListItem(MAP_INDEX_MENU.STATS_MENU)}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon>
+                  <StackedLineChartIcon />
+                </ListItemIcon>
+                <ListItemText primary="Danh mục theo quý" />
+              </ListItemButton>
+            </List>
+          </Link>
+
+          <Link
+            to="/revenue-stats-year"
+            style={{ textDecoration: "none", color: "gray" }}
+          >
+            <List component="div" disablePadding>
+              <ListItemButton
+                selected={props.selectedMenuItem === MAP_INDEX_MENU.STATS_MENU}
+                onClick={() => props.onClickListItem(MAP_INDEX_MENU.STATS_MENU)}
+                sx={{ pl: 4 }}
+              >
+                <ListItemIcon>
+                  <DonutSmallIcon />
+                </ListItemIcon>
+                <ListItemText primary="Danh mục theo năm" />
+              </ListItemButton>
+            </List>
+          </Link>
         </Collapse>
       </List>
     </>

@@ -25,47 +25,47 @@ const threeDotsStyle = {
 };
 
 const Foods = () => {
-    const [foods, setFoods] = useState([])
-    const [page, setPage] = useState(1)
-    const [tags] = useSearchParams("")
-    const [name] = useSearchParams("")
-    const [price] = useSearchParams("")
+  const [foods, setFoods] = useState([]);
+  const [page, setPage] = useState(1);
+  const [tags] = useSearchParams("");
+  const [name] = useSearchParams("");
+  const [price] = useSearchParams("");
 
-    useEffect(() => {
-        const loadFoods = async () => {
-            try {
-                let e = `${endpoints['foods']}?page=${page}`
+  useEffect(() => {
+    const loadFoods = async () => {
+      try {
+        let e = `${endpoints["foods"]}?page=${page}`;
 
-                let kw = name.get('name')
-                let p = price.get('price')
-                if (kw !== null)
-                  e += `&name=${kw}`
-                
-                if (p !== null)
-                  e += `&price=${p}`
-                
-                // let tagId = tags.get('tags')
-                // if (tagId !== null)
-                //     e += `&tag_id=${tagId}`
+        let kw = name.get("name");
+        let p = price.get("price");
+        if (kw !== null) e += `&name=${kw}`;
 
-                let res = await API.get(e)
-                setFoods(res.data.results)
-            } catch (ex) {
-                setPage(1)
-            }
-        }
+        if (p !== null) e += `&price=${p}`;
 
-        setFoods(null)
-        loadFoods()
-    }, [page, name, price])
+        // let tagId = tags.get('tags')
+        // if (tagId !== null)
+        //     e += `&tag_id=${tagId}`
 
-  const nextPage = () => setPage(current => current + 1)
-  const prevPage = () => setPage(current => current-1)
+        let res = await API.get(e);
+        setFoods(res.data.results);
+      } catch (ex) {
+        setPage(1);
+      }
+    };
+
+    setFoods(null);
+    loadFoods();
+  }, [page, name, price]);
+
+  const nextPage = () => setPage((current) => current + 1);
+  const prevPage = () => setPage((current) => current - 1);
 
   if (foods === null) return <Loading />;
 
   if (foods === 0)
-    return <div className="alert alert-info">Không có món ăn nào được tìm thấy</div>
+    return (
+      <div className="alert alert-info">Không có món ăn nào được tìm thấy</div>
+    );
 
   return (
     <>
@@ -95,7 +95,7 @@ const Foods = () => {
                         src={f.image}
                         className="object-fit:cover"
                         style={{
-                          width: 225,
+                          width: "100%",
                           height: 225,
                           boxShadow: "0px 2px 20px rgb(0 0 0 / 12%)",
                         }}
@@ -150,4 +150,4 @@ const Foods = () => {
   );
 };
 
-export default Foods
+export default Foods;
