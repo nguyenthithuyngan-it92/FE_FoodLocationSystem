@@ -106,6 +106,7 @@ export default function ReactVirtualizedTable(props) {
   const { columns = columnsDefault, rows = rowsDefault } = props;
   const [loading, setLoading] = React.useState(false);
 
+  // load header table (column)
   const fixedHeaderContent = () => {
     return (
       <TableRow>
@@ -132,6 +133,7 @@ export default function ReactVirtualizedTable(props) {
     );
   };
 
+  // load data table
   const rowContent = (_index, row) => {
     const renderActive = (isActive) => {
       return isActive ? (

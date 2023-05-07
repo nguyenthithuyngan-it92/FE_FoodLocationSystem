@@ -36,7 +36,7 @@ const FoodDetail = () => {
     let loadFoodDetailById = async () => {
       let res = await API.get(endpoints["food-by-id"](foodId));
       if (res.status === 200) {
-        setFoodDetail(res.data);
+        //setFoodDetail(res.data);
       }
     };
 

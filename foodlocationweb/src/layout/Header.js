@@ -35,16 +35,26 @@ const Header = () => {
     const [order, setOrder] = useState([]);
 
   useEffect(() => {
-    const loadOrder = async () => {
-      try {
-        let res = await authAPI().get(endpoints["orders"]);
-        if (res.status === 200) {
-          console.log(res.data);
-          setOrder(res.data);
+    const timmerId = setInterval(() => {
+      const loadOrder = async () => {
+        try {
+          let res = await authAPI().get(endpoints["orders"]);
+          if (res.status === 200) {
+            console.log(res.data);
+            setOrder(res.data);
+          }
+        } catch (err) {
+          console.log(err);
         }
-      } catch {}
+      };
+
+      loadOrder();
+    }, 30000);
+
+    // xóa timmer id khi unmount component tránh bị memory leak
+    return () => {
+      clearInterval(timmerId);
     };
-    loadOrder();
   }, [user]);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -200,8 +210,8 @@ const Header = () => {
                         }}
                       >
                         Bạn đã đặt thành công đơn hàng với tổng tiền{" "}
-                        {numberWithCommas(o.amount)} VNĐ vào lúc{" "}
-                        <Moment fromNow>{o.created_date}</Moment>{" "}
+                        {numberWithCommas(o.amount)} VNĐ, sẽ được giao cho{" "}
+                        {o.receiver_name} tại địa chỉ {o.receiver_address}.
                       </Typography>
                       <Divider component="li" />
                     </div>
@@ -247,7 +257,7 @@ const Header = () => {
                         }}
                       >
                         Đơn hàng có tổng tiền {numberWithCommas(o.amount)} VNĐ
-                        đang được giao đến bạn!
+                        đang được giao đến bạn tại địa chỉ {o.receiver_address}!
                       </Typography>
                       <Divider component="li" />
                     </div>
@@ -279,7 +289,7 @@ const Header = () => {
                             marginLeft: 5,
                           }}
                         >
-                          <Moment fromNow>{o.created_date}</Moment>
+                          <Moment fromNow>{o.payment_date}</Moment>
                         </caption>
                       </ListItem>
                       <Typography
@@ -293,8 +303,9 @@ const Header = () => {
                         }}
                       >
                         Đơn hàng có tổng tiền {numberWithCommas(o.amount)} VNĐ
-                        của bạn đã được giao vào{" "}
-                        <Moment fromNow>{o.payment_date}</Moment>{" "}
+                        của bạn đã được giao vào lúc{" "}
+                        <Moment fromNow>{o.payment_date}</Moment> tại{" "}
+                        {o.receiver_address}.
                       </Typography>
                       <Divider component="li" />
                     </div>

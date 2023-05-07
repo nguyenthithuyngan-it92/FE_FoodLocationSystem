@@ -285,7 +285,7 @@ const StoreManagement = () => {
     loadData();
   }, [selectedMenuItem, refresher]);
 
-  // load form ADD dialog
+  // LOAD FORM DIALOG (MENU, FOOD)
   const renderForm = (type) => {
     if (type === MAP_INDEX_MENU.MENU) {
       return (
@@ -456,6 +456,7 @@ const StoreManagement = () => {
     }
   };
 
+  // EDIT MENU
   const editMenu = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -533,6 +534,11 @@ const StoreManagement = () => {
           navigate("/store-management");
         } else setErr("Hệ thống bị lỗi! Vui lòng quay lại sau");
       }
+      if (formFood.name === "") setErr("Phải nhập tên món ăn!");
+      else if (formFood.price === "") setErr("Phải nhập giá bán!");
+      else if (formFood.menu_item === "") setErr("Phải chọn danh mục món ăn!");
+      else if (image_food.current.files.length === 0)
+        setErr("Phải chọn ảnh món ăn!");
     } catch (ex) {
       let e = "";
       for (let d of Object.values(ex.response.data)) e += `${d} <br />`;
@@ -543,6 +549,7 @@ const StoreManagement = () => {
     }
   };
 
+  // EDIT FOOD
   const editFood = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -600,7 +607,7 @@ const StoreManagement = () => {
     }
   };
 
-  // button ADD
+  // LOAD BUTTON FORM DIALOG
   const renderButtonAdd = (type, isEdit) => {
     if (isEdit) {
       return (
@@ -686,7 +693,7 @@ const StoreManagement = () => {
         res = await authAPI().delete(endpoints["action-food"](data.id));
       }
       if (type === ACTION_TYPES_V1.EDIT) {
-        console.log("data clicked :>", data);
+        // console.log("data clicked :>", data);
         let currentMenu;
         if (menu) {
           currentMenu = menu.find(
@@ -720,6 +727,7 @@ const StoreManagement = () => {
     }
   };
 
+  // SET ORDER_STATUS
   const handleConfirmOrder = async (data) => {
     try {
       let res = await authAPI().post(endpoints["confirm-order"](data.id));
@@ -763,7 +771,7 @@ const StoreManagement = () => {
     );
   else if (user.user_role !== 1)
     return (
-      <Alert severity="warning">
+      <Alert severity="warning" style={{ margin: 5 }}>
         Tài khoản của bạn không có quyền truy cập!
       </Alert>
     );

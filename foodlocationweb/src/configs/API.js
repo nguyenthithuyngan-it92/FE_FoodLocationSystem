@@ -13,14 +13,15 @@ export const endpoints = {
   user: "/users/",
   "menu-items": "/menu-items/",
   orders: "/orders/",
+  payMomo: "/create_payment/",
   login: "/o/token/",
   "current-user": "/users/current-user/",
-  register: "/users/",
-  "register-store": "/users/",
-  "payment-method": "/paymentmethod/",
+  register: "/users/", //create user
+  "register-store": "/users/", //create store
+  "payment-method": "/paymentmethod/", //get list payment
 
-  "menu-management": "/stores/menu-management/",
-  "food-management": "/stores/food-management/",
+  "menu-management": "/stores/menu-management/", //get menu - store management
+  "food-management": "/stores/food-management/", //get food - store management
   "menu-store": (storeId) => `/stores/${storeId}/menu-item/`, //get list menu by store id
   "food-list": (storeId) => `/food-list/${storeId}/get_food_by_store_id/`, //get list food by store id
   "order-store": "/orders/", //đặt món
@@ -38,6 +39,10 @@ export const endpoints = {
     `subcribes/${storeId}/count_follower_by_store/`, //đếm follower
 
   // "revenue-stats-year": "/revenue-stats-year/", //thống kê doanh thu theo năm
+
+  "get-location": (location) =>
+    `https://nominatim.openstreetmap.org/search?q=${location}&format=json`,
+
 };
 
 export const authAPI = () =>

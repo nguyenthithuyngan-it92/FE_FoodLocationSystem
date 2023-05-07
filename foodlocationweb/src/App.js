@@ -19,6 +19,8 @@ import ProfileUser from "./components/ProfileUser";
 import FoodDetail from "./components/FoodDetail";
 import StoreFeedback from "./components/StoreFeedback";
 import RevenueStatsYear from "./components/StatsYear";
+import RevenueStatsMonth from "./components/StatsMonth";
+import RevenueStatsQuarter from "./components/StatsQuarter";
 
 import "moment/locale/vi";
 import moment from "moment";
@@ -57,7 +59,9 @@ function App() {
             <Route path="/cart" element={<CartOrder />} />
             <Route path="/foods/:foodId/" element={<FoodDetail />} />
             <Route path="/stores/:storeId/" element={<StoreFeedback />} />
-            <Route path="/revenue-stats-year/" element={<RevenueStatsYear />} />v
+            <Route path="/revenue-stats-month/" element={<RevenueStatsMonth />} />
+            <Route path="/revenue-stats-quarter/" element={<RevenueStatsQuarter />} />
+            <Route path="/revenue-stats-year/" element={<RevenueStatsYear />} />
             <Route path="*" element={<h1>Comming soon...</h1>}></Route>
           </Routes>
         </Container>
