@@ -1,20 +1,45 @@
-import React from 'react';
-import { Col, Container, Row } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Button, Col, Container, Row } from 'react-bootstrap';
+import API, { endpoints } from '../configs/API';
+import { Link } from 'react-router-dom';
+import styled from '@emotion/styled';
 
-function Home() {
+const Home = () => {
+  const [tags, setTags] = useState([])
+
+
+  useEffect(() => {
+    const loadTags = async () => {
+      let res = await API.get(endpoints['tags']);
+      console.log(res.data.results);
+      setTags(res.data.results);
+    };
+
+    loadTags();
+  }, []);
   return (
-    <Container>
+    <div className='home'>
+      <Container fluid className="banner">
         <Row>
-        <Col>
-        <div>
-        <h1>Welcome to our FoodLocation!</h1>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam erat volutpat. Sed mollis felis vitae libero euismod, vel imperdiet purus aliquam. Donec sit amet nisl at eros mollis pellentesque eget vel nunc. Sed pulvinar arcu id orci finibus, a ultrices urna posuere. Donec euismod sem ac orci vehicula, non varius purus laoreet. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. In tempor malesuada urna, eget laoreet felis imperdiet at.</p>
-        </div>
-        </Col>
-        <Col>2 of 2</Col>
-      </Row>
+          <Col>
+            <div>
+              <h1>Đặt món online tại TN & KN </h1>
+              <h4>Giao hàng tận nơi</h4>
+              {tags.map(t => {
+                let url = `/food/?tagId=${t.id}`
+                return (
+                  <Button style={{width: 100, fontWeight: "bold"}} key={t.id} className="btn btn-link">
+                    <Link to={url} className="text-decoration-none">{t.name}</Link>
+                  </Button>
+                  )
+                })}
+            </div>
+          </Col>
+          <Col>2 of 2</Col>
+        </Row>
 
-    </Container>
+      </Container>
+    </div>
   );
 }
 

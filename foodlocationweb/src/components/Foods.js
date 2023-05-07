@@ -27,20 +27,26 @@ const threeDotsStyle = {
 const Foods = () => {
     const [foods, setFoods] = useState([])
     const [page, setPage] = useState(1)
-    const [q] = useSearchParams("")
+    const [tags] = useSearchParams("")
+    const [name] = useSearchParams("")
+    const [price] = useSearchParams("")
 
     useEffect(() => {
         const loadFoods = async () => {
             try {
                 let e = `${endpoints['foods']}?page=${page}`
 
-                let kw = q.get('q')
+                let kw = name.get('name')
+                let p = price.get('price')
                 if (kw !== null)
-                    e += `&q=${kw}`
+                  e += `&name=${kw}`
                 
-                let tagId = q.get('q')
-                if (tagId !== null)
-                    e += `&tag_id=${tagId}`
+                if (p !== null)
+                  e += `&price=${p}`
+                
+                // let tagId = tags.get('tags')
+                // if (tagId !== null)
+                //     e += `&tag_id=${tagId}`
 
                 let res = await API.get(e)
                 setFoods(res.data.results)
@@ -51,12 +57,15 @@ const Foods = () => {
 
         setFoods(null)
         loadFoods()
-    }, [page, q])
+    }, [page, name, price])
 
   const nextPage = () => setPage(current => current + 1)
   const prevPage = () => setPage(current => current-1)
 
   if (foods === null) return <Loading />;
+
+  if (foods === 0)
+    return <div className="alert alert-info">Không có món ăn nào được tìm thấy</div>
 
   return (
     <>

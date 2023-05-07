@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import API, { endpoints } from "../configs/API";
+import API, { authAPI, endpoints } from "../configs/API";
 import { Button, Container, Form, Nav, Navbar } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../configs/MyContext";
@@ -18,18 +18,34 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import ButtonM from "@mui/material/Button";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import CreditScoreIcon from "@mui/icons-material/CreditScore";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
+import { Divider, ListItem, ListItemText, Typography } from "@mui/material";
+import Moment from "react-moment";
+import { numberWithCommas } from "../utils/converters";
 
 const Header = () => {
-    const [tags, setTags] = useState([])
+    
     const [user, dispatch] = useContext(UserContext)
-    const [q, setQ] = useState()
+    const [name, setName] = useState()
+    const [price, setPrice] = useState()
     const nav = useNavigate()
+    const [order, setOrder] = useState([]);
 
-  // const [open, setOpen] = useState(false);
-
-  // const handleClick = () => {
-  //     setOpen(!open);
-  // };
+  useEffect(() => {
+    const loadOrder = async () => {
+      try {
+        let res = await authAPI().get(endpoints["orders"]);
+        if (res.status === 200) {
+          console.log(res.data);
+          setOrder(res.data);
+        }
+      } catch {}
+    };
+    loadOrder();
+  }, [user]);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -40,18 +56,27 @@ const Header = () => {
     setAnchorEl(null);
   };
 
-  useEffect(() => {
-    const loadTags = async () => {
-      let res = await API.get(endpoints["tags"]);
-      setTags(res.data.results);
-    };
+  const [anchorE2, setAnchorE2] = React.useState(null);
+  const openNofi = Boolean(anchorE2);
+  const handleClickNofi = (event) => {
+    setAnchorE2(event.currentTarget);
+  };
+  const handleCloseNofi = () => {
+    setAnchorE2(null);
+  };
 
-    loadTags();
-  }, []);
+  
 
   const search = (evt) => {
         evt.preventDefault()
-        nav(`/?q=${q}`)
+        if (name)
+          nav(`/food/?name=${name}`)
+          
+        if (price)
+          nav(`/food/?price=${price}`)
+
+        // if (tags)
+        //   nav(`/food/?tags=${tags}`) 
     }
 
   const logout = () => {
@@ -70,7 +95,7 @@ const Header = () => {
           aria-expanded={open ? "true" : undefined}
           onClick={handleClick}
         >
-          <AccountCircleIcon fontSize="small" className="m-2" /> Tài khoản
+          <AccountCircleIcon fontSize="small" className="m-1" /> Tài khoản
         </ButtonM>
         <Menu
           id="basic-menu"
@@ -105,6 +130,181 @@ const Header = () => {
   if (user !== null)
     userInfo = (
       <>
+        {/* NOTIFICATION ORDER */}
+        {user.user_role === 0 && user.is_superuser != 1 ? (
+          <div>
+            <ButtonM
+              id="basic-button"
+              color="warning"
+              aria-controls={openNofi ? "basic-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={openNofi ? "true" : undefined}
+              onClick={handleClickNofi}
+            >
+              <NotificationsActiveIcon color="warning" fontSize="small" />
+            </ButtonM>
+            <Menu
+              style={{
+                height: "300px",
+                maxWidth: "450px",
+                whiteSpace: "wrap",
+              }}
+              id="basic-menu"
+              anchorEl={anchorE2}
+              open={openNofi}
+              onClose={handleCloseNofi}
+              MenuListProps={{
+                "aria-labelledby": "basic-button",
+              }}
+            >
+              {order.map((o) => (
+                <MenuItem onClick={handleCloseNofi}>
+                  {o.order_status == 0 ? (
+                    <div>
+                      <ListItem style={{ padding: 0 }}>
+                        <ListItemText
+                          style={{
+                            display: "flex",
+                            height: "auto",
+                            whiteSpace: "wrap",
+                          }}
+                          secondary={
+                            <PendingActionsIcon
+                              style={{
+                                color: "red",
+                                fontSize: 16,
+                                marginLeft: 5,
+                              }}
+                            />
+                          }
+                          primary="Đơn hàng chưa được xác nhận"
+                        />
+                        <caption
+                          style={{
+                            fontSize: 12,
+                            fontStyle: "italic",
+                            marginLeft: 5,
+                          }}
+                        >
+                          <Moment fromNow>{o.created_date}</Moment>
+                        </caption>
+                      </ListItem>
+                      <Typography
+                        color="text.secondary"
+                        variant="body2"
+                        style={{
+                          width: "350px",
+                          marginBottom: 10,
+                          height: "auto",
+                          whiteSpace: "break-spaces",
+                        }}
+                      >
+                        Bạn đã đặt thành công đơn hàng với tổng tiền{" "}
+                        {numberWithCommas(o.amount)} VNĐ vào lúc{" "}
+                        <Moment fromNow>{o.created_date}</Moment>{" "}
+                      </Typography>
+                      <Divider component="li" />
+                    </div>
+                  ) : null}
+                  {o.order_status == 1 ? (
+                    <div>
+                      <ListItem style={{ padding: 0 }}>
+                        <ListItemText
+                          style={{
+                            display: "flex",
+                            height: "auto",
+                            whiteSpace: "wrap",
+                          }}
+                          secondary={
+                            <DeliveryDiningIcon
+                              style={{
+                                color: "orange",
+                                fontSize: 16,
+                                marginLeft: 5,
+                              }}
+                            />
+                          }
+                          primary="Đơn hàng đang giao đến bạn"
+                        />
+                        <caption
+                          style={{
+                            fontSize: 12,
+                            fontStyle: "italic",
+                            marginLeft: 5,
+                          }}
+                        >
+                          <Moment fromNow>{o.payment_date}</Moment>
+                        </caption>
+                      </ListItem>
+                      <Typography
+                        color="text.secondary"
+                        variant="body2"
+                        style={{
+                          width: "350px",
+                          marginBottom: 10,
+                          height: "auto",
+                          whiteSpace: "break-spaces",
+                        }}
+                      >
+                        Đơn hàng có tổng tiền {numberWithCommas(o.amount)} VNĐ
+                        đang được giao đến bạn!
+                      </Typography>
+                      <Divider component="li" />
+                    </div>
+                  ) : null}
+                  {o.order_status == 2 ? (
+                    <div>
+                      <ListItem style={{ padding: 0 }}>
+                        <ListItemText
+                          style={{
+                            display: "flex",
+                            height: "auto",
+                            whiteSpace: "wrap",
+                          }}
+                          secondary={
+                            <CreditScoreIcon
+                              style={{
+                                color: "green",
+                                fontSize: 16,
+                                marginLeft: 5,
+                              }}
+                            />
+                          }
+                          primary="Đơn hàng giao thành công"
+                        />
+                        <caption
+                          style={{
+                            fontSize: 12,
+                            fontStyle: "italic",
+                            marginLeft: 5,
+                          }}
+                        >
+                          <Moment fromNow>{o.created_date}</Moment>
+                        </caption>
+                      </ListItem>
+                      <Typography
+                        color="text.secondary"
+                        variant="body2"
+                        style={{
+                          width: "350px",
+                          marginBottom: 10,
+                          height: "auto",
+                          whiteSpace: "break-spaces",
+                        }}
+                      >
+                        Đơn hàng có tổng tiền {numberWithCommas(o.amount)} VNĐ
+                        của bạn đã được giao vào{" "}
+                        <Moment fromNow>{o.payment_date}</Moment>{" "}
+                      </Typography>
+                      <Divider component="li" />
+                    </div>
+                  ) : null}
+                </MenuItem>
+              ))}
+            </Menu>
+          </div>
+        ) : null}
+        {/* ACCOUNT */}
         <div>
           <ButtonM
             id="basic-button"
@@ -143,9 +343,12 @@ const Header = () => {
 
             <MenuItem onClick={handleClose}>
               {user.is_superuser == 1 ? (
-                <Link to="#" className="nav-link text-primary">
+                <a
+                  href="http://127.0.0.1:8000/admin/"
+                  className="nav-link text-primary"
+                >
                   <AdminPanelSettingsIcon fontSize="small" /> Trang quản trị
-                </Link>
+                </a>
               ) : (
                 <Link to="/profile-user" className="nav-link text-primary">
                   <ManageAccountsIcon fontSize="small" /> Quản lý tài khoản
@@ -171,11 +374,7 @@ const Header = () => {
                 <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="me-auto" style={{ alignItems: "center" }}>
                     <Link to="/" className="nav-link active">&#127968; Trang chủ</Link>
-                    {tags.map(t => {
-                        let url = `/?tagId=${t.id}`
-                        return <Link key={t.id} className="nav-link" to={url}>{t.name}</Link>
-                    })}
-
+                    
                     {/* {tags.map(t => <Nav.Link href="#link">{t.name}</Nav.Link>)} */}
 
                     {userInfo}
@@ -184,11 +383,19 @@ const Header = () => {
                 <Form onSubmit={search} className="d-flex">
                   <Form.Control
                     type="search"
-                    placeholder="Tìm kiếm..."
+                    placeholder="Tìm kiếm theo tên món ăn..."
                     className="me-2"
                     aria-label="Search"
-                    value={q}
-                    onChange={evt => setQ(evt.target.value)}
+                    value={name}
+                    onChange={evt => setName(evt.target.value)}
+                  />
+                  <Form.Control
+                    type="search"
+                    placeholder="Tìm kiếm theo giá món ăn..."
+                    className="me-2"
+                    aria-label="Search"
+                    value={price}
+                    onChange={evt => setPrice(evt.target.value)}
                   />
                   <Button type="submit" variant="outline-success">Tìm</Button>
                 </Form>

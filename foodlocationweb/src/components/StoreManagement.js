@@ -153,7 +153,10 @@ const StoreManagement = () => {
 
   const [user] = useContext(UserContext);
   const [open, setOpen] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   const [dataTable, setDataTable] = useState([]);
+  const [isEditData, setIsEditData] = useState(false);
+  const [cacheEditId, setCacheEditId] = useState(null);
   const [selectedMenuItem, setSelectedMenuItem] = useState(MAP_INDEX_MENU.MENU);
   const [menu, setMenu] = useState([]);
   const [refresher, setRefresher] = useState(1);
@@ -179,6 +182,20 @@ const StoreManagement = () => {
   });
   const image_food = useRef();
   const navigate = useNavigate();
+
+  // event click
+  const handleListItemClick = (type) => {
+    setSelectedMenuItem(type);
+  };
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  };
 
   const [openMess, setOpenMess] = useState(false);
 
@@ -212,18 +229,7 @@ const StoreManagement = () => {
     loadTags();
   }, []);
 
-  // event click
-  const handleListItemClick = (type) => {
-    setSelectedMenuItem(type);
-  };
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  // load store
+  //LOAD DATA TABLE BY SELECTEDITEM
   useEffect(() => {
     let loadData = async () => {
       // console.log("trigger refresher");
@@ -254,13 +260,15 @@ const StoreManagement = () => {
               url = "order-accepted";
             }
 
-            let temp_o = await authAPI().get(endpoints[url]);
+            let tempO = await authAPI().get(endpoints[url]);
+            console.log(tempO.data);
             res = {
-              data: temp_o.data.map((item) => {
-                const { paymentmethod = {}, ...restInfo } = item;
+              data: tempO.data.map((i) => {
+                const { paymentmethod = {}, ...restInfo } = i;
+                // console.log(paymentmethod);
                 return {
                   ...restInfo,
-                  paymentmethod_name: paymentmethod.name || "",
+                  paymentmethod_name: paymentmethod.name || "Tiền mặt",
                 };
               }),
             };
@@ -277,9 +285,9 @@ const StoreManagement = () => {
     loadData();
   }, [selectedMenuItem, refresher]);
 
-  // load form dialog
+  // load form ADD dialog
   const renderForm = (type) => {
-    if (type === MAP_INDEX_MENU.MENU)
+    if (type === MAP_INDEX_MENU.MENU) {
       return (
         <InputFormUser
           label="Tên danh mục"
@@ -294,6 +302,7 @@ const StoreManagement = () => {
           }}
         />
       );
+    }
 
     return (
       <>
@@ -447,64 +456,37 @@ const StoreManagement = () => {
     }
   };
 
-  // ACTION MENU (EDIT, DELETE, CHANGE_STATUS)
-  const handleActionMenu = async (type, data) => {
+  const editMenu = async (e) => {
+    e.preventDefault();
+    setLoading(true);
     try {
-      let res;
-      if (type === ACTION_TYPES_V1.CHANGE_STATUS) {
-        res = await authAPI().post(endpoints["status-menu"](data.id));
-      }
-      if (type === ACTION_TYPES_V1.DELETE) {
-        res = await authAPI().delete(endpoints["action-menu"](data.id));
-      }
-      if (type === ACTION_TYPES_V1.EDIT) {
-        res = await authAPI().put(endpoints["action-menu"](data.id));
-      }
+      const params = {
+        ...formMenu,
+      };
 
-      if (res && res.status === 200) {
+      let res = await authAPI().put(
+        endpoints["action-menu"](cacheEditId),
+        params
+      );
+      console.info(res);
+
+      if (res.status === 200) {
+        setRefresher((pre) => pre + 1);
+        setFormMenu({
+          name: "",
+        });
+        setCacheEditId(null);
+        setIsEditData(false);
+        setOpen(false);
         setMess(res.data.message);
         setOpenMess(true);
-        setRefresher((pre) => pre + 1);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+        navigate("/store-management");
+      } else setErr("Hệ thống bị lỗi! Vui lòng quay lại sau");
+    } catch (ex) {
+      let e = "";
+      for (let d of Object.values(ex.response.data)) e += `${d} <br />`;
 
-  // ACTION FOOD (EDIT, DELETE, CHANGE_STATUS)
-  const handleActionFood = async (type, data) => {
-    try {
-      let res;
-      if (type === ACTION_TYPES_V1.CHANGE_STATUS) {
-        res = await authAPI().post(endpoints["status-food"](data.id));
-      }
-      if (type === ACTION_TYPES_V1.DELETE) {
-        res = await authAPI().delete(endpoints["action-food"](data.id));
-      }
-      if (type === ACTION_TYPES_V1.EDIT) {
-        res = await authAPI().put(endpoints["action-food"](data.id));
-      }
-
-      if (res && res.status === 200) {
-        setMess(res.data.message);
-        setOpenMess(true);
-        setRefresher((pre) => pre + 1);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleConfirmOrder = async (data) => {
-    try {
-      let res = await authAPI().post(endpoints["confirm-order"](data.id));
-      if (res && res.status === 200) {
-        setMess(res.data.message);
-        setOpenMess(true);
-        setRefresher((pre) => pre + 1);
-      }
-    } catch (err) {
-      console.log(err);
+      setErr(e);
     } finally {
       setLoading(false);
     }
@@ -561,9 +543,80 @@ const StoreManagement = () => {
     }
   };
 
-  // button
-  const renderButtonAdd = (type) => {
-    if (type === MAP_INDEX_MENU.MENU)
+  const editFood = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      let form = new FormData();
+      form.append("name", formFood.name);
+      form.append("price", formFood.price);
+      form.append("description", formFood.description);
+      form.append("start_time", formFood.start_time);
+      form.append("end_time", formFood.end_time);
+      form.append("menu_item", formFood.menu_item);
+
+      const newTags = tagsValue.map((tag) => ({ id: tag.id }));
+      form.append("tags", JSON.stringify(newTags));
+
+      if (image_food.current.files.length > 0)
+        form.append("image_food", image_food.current.files[0]);
+
+      let res = await authAPI().put(
+        endpoints["action-food"](cacheEditId),
+        form,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (res.status === 200) {
+        setFormFood({
+          name: "",
+          price: "",
+          description: "",
+          start_time: "",
+          end_time: "",
+          menu_item: "",
+          image: "",
+        });
+        setCacheEditId(null);
+        setIsEditData(false);
+        setTagsValue([]);
+        setRefresher((pre) => pre + 1);
+        setOpen(false);
+        setOpenMess(true);
+        setMess(res.data.message);
+        navigate("/store-management");
+      } else setErr("Hệ thống bị lỗi! Vui lòng quay lại sau");
+    } catch (ex) {
+      let e = "";
+      for (let d of Object.values(ex.response.data)) e += `${d} <br />`;
+
+      setErr(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // button ADD
+  const renderButtonAdd = (type, isEdit) => {
+    if (isEdit) {
+      return (
+        <LoadingButton
+          loading={loading}
+          loadingPosition="start"
+          startIcon={<SaveIcon />}
+          variant="outlined"
+          onClick={type === MAP_INDEX_MENU.MENU ? editMenu : editFood}
+        >
+          {type === MAP_INDEX_MENU.MENU ? "Chỉnh sửa menu" : "Chỉnh sửa món ăn"}
+        </LoadingButton>
+      );
+    }
+
+    if (type === MAP_INDEX_MENU.MENU) {
       return (
         <LoadingButton
           loading={loading}
@@ -575,7 +628,7 @@ const StoreManagement = () => {
           Thêm menu
         </LoadingButton>
       );
-    else {
+    } else {
       return (
         <LoadingButton
           loading={loading}
@@ -588,6 +641,97 @@ const StoreManagement = () => {
           Thêm món ăn
         </LoadingButton>
       );
+    }
+  };
+
+  // ACTION MENU (EDIT, DELETE, CHANGE_STATUS)
+  const handleActionMenu = async (type, data) => {
+    try {
+      let res;
+      if (type === ACTION_TYPES_V1.CHANGE_STATUS) {
+        res = await authAPI().post(endpoints["status-menu"](data.id));
+      }
+      if (type === ACTION_TYPES_V1.DELETE) {
+        res = await authAPI().delete(endpoints["action-menu"](data.id));
+      }
+      if (type === ACTION_TYPES_V1.EDIT) {
+        setIsEditData(true);
+        setFormMenu({
+          ...formMenu,
+          name: data.name,
+        });
+        setCacheEditId(data.id);
+        setOpen(true);
+        return;
+      }
+
+      if (res && res.status === 200) {
+        setMess(res.data.message);
+        setOpenMess(true);
+        setRefresher((pre) => pre + 1);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // ACTION FOOD (EDIT, DELETE, CHANGE_STATUS)
+  const handleActionFood = async (type, data) => {
+    try {
+      let res;
+      if (type === ACTION_TYPES_V1.CHANGE_STATUS) {
+        res = await authAPI().post(endpoints["status-food"](data.id));
+      }
+      if (type === ACTION_TYPES_V1.DELETE) {
+        res = await authAPI().delete(endpoints["action-food"](data.id));
+      }
+      if (type === ACTION_TYPES_V1.EDIT) {
+        console.log("data clicked :>", data);
+        let currentMenu;
+        if (menu) {
+          currentMenu = menu.find(
+            (menuItem) => menuItem.name === data.menu_name
+          );
+        }
+
+        setCacheEditId(data.id);
+        setFormFood({
+          ...formFood,
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          start_time: data.start_time,
+          end_time: data.end_time,
+          menu_item: currentMenu ? currentMenu.id : null,
+        });
+        setTagsValue(data.tags);
+        setIsEditData(true);
+        setOpen(true);
+        return;
+      }
+
+      if (res && res.status === 200) {
+        setMess(res.data.message);
+        setOpenMess(true);
+        setRefresher((pre) => pre + 1);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleConfirmOrder = async (data) => {
+    try {
+      let res = await authAPI().post(endpoints["confirm-order"](data.id));
+      if (res && res.status === 200) {
+        setMess(res.data.message);
+        setOpenMess(true);
+        setRefresher((pre) => pre + 1);
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -624,6 +768,7 @@ const StoreManagement = () => {
       </Alert>
     );
 
+  // =====CODE UI====
   return (
     <>
       <div>
@@ -685,11 +830,11 @@ const StoreManagement = () => {
             minWidth: "400px",
           }}
         >
-          TẠO MỚI
+          {isEditData ? "Chỉnh sửa thông tin" : "TẠO MỚI"}
         </DialogTitle>
         <Divider color="gray" />
         <DialogContent style={{ minWidth: "400px" }}>
-          {renderForm(selectedMenuItem)}
+          {renderForm(selectedMenuItem, isEditData)}
         </DialogContent>
         <DialogActions>
           <Button
@@ -699,7 +844,7 @@ const StoreManagement = () => {
           >
             Hủy
           </Button>
-          {renderButtonAdd(selectedMenuItem)}
+          {renderButtonAdd(selectedMenuItem, isEditData)}
         </DialogActions>
       </Dialog>
     </>
