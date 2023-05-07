@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import API, { endpoints } from "../configs/API";
 import {
   Button,
@@ -25,27 +25,47 @@ const threeDotsStyle = {
 };
 
 const Foods = () => {
-  const [foods, setFoods] = useState([]);
-  const [page, setPage] = useState(1);
+    const [foods, setFoods] = useState([])
+    const [page, setPage] = useState(1)
+    const [tags] = useSearchParams("")
+    const [name] = useSearchParams("")
+    const [price] = useSearchParams("")
 
-  useEffect(() => {
-    const loadFoods = async () => {
-      try {
-        let e = `${endpoints["foods"]}?page=${page}`;
-        let res = await API.get(e);
-        setFoods(res.data.results);
-      } catch (ex) {
-        setPage(1);
-      }
-    };
+    useEffect(() => {
+        const loadFoods = async () => {
+            try {
+                let e = `${endpoints['foods']}?page=${page}`
 
-    loadFoods();
-  }, [page]);
+                let kw = name.get('name')
+                let p = price.get('price')
+                if (kw !== null)
+                  e += `&name=${kw}`
+                
+                if (p !== null)
+                  e += `&price=${p}`
+                
+                // let tagId = tags.get('tags')
+                // if (tagId !== null)
+                //     e += `&tag_id=${tagId}`
 
-  const nextPage = () => setPage((current) => current + 1);
-  const prevPage = () => setPage((current) => current - 1);
+                let res = await API.get(e)
+                setFoods(res.data.results)
+            } catch (ex) {
+                setPage(1)
+            }
+        }
+
+        setFoods(null)
+        loadFoods()
+    }, [page, name, price])
+
+  const nextPage = () => setPage(current => current + 1)
+  const prevPage = () => setPage(current => current-1)
 
   if (foods === null) return <Loading />;
+
+  if (foods === 0)
+    return <div className="alert alert-info">Không có món ăn nào được tìm thấy</div>
 
   return (
     <>
@@ -130,4 +150,4 @@ const Foods = () => {
   );
 };
 
-export default Foods;
+export default Foods

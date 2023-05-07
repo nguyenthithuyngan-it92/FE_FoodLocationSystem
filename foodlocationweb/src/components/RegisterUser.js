@@ -55,7 +55,7 @@ const RegisterUser = () => {
     };
 
     if (user.username === "" || user.password === "")
-      setErr("Username hoặc password phải nhập!");
+      setErr("Username hoặc password không được bỏ trống!");
     else if (user.password !== user.confirmPassword)
       setErr("Mật khẩu xác nhận không khớp!");
     else if (avatar.current.files.length === 0)

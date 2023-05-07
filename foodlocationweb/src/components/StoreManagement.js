@@ -835,7 +835,7 @@ const StoreManagement = () => {
       <div>
         {/* INFO STORE */} <InfoStore />
         {/* CHỨC NĂNG QUẢN LÝ */}
-        {user.is_verify == 1 ? (
+        {user.is_verify === 1 ? (
           <div style={{ display: "flex", gap: "15px" }}>
             {/* DANH SÁCH CHỨC NĂNG */}
             <FuncStore
