@@ -22,7 +22,13 @@ import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import CreditScoreIcon from "@mui/icons-material/CreditScore";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import DeliveryDiningIcon from "@mui/icons-material/DeliveryDining";
-import { Divider, ListItem, ListItemText, Typography } from "@mui/material";
+import {
+  Badge,
+  Divider,
+  ListItem,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import Moment from "react-moment";
 import { numberWithCommas } from "../utils/converters";
 
@@ -34,18 +40,6 @@ const Header = () => {
 
   useEffect(() => {
     const timmerId = setInterval(() => {
-      const loadOrder = async () => {
-        try {
-          let res = await authAPI().get(endpoints["orders"]);
-          if (res.status === 200) {
-            console.log(res.data);
-            setOrder(res.data);
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      };
-
       loadOrder();
     }, 30000);
 
@@ -53,7 +47,26 @@ const Header = () => {
     return () => {
       clearInterval(timmerId);
     };
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      loadOrder();
+    }
   }, [user]);
+
+  const loadOrder = async () => {
+    console.count("trigger");
+    try {
+      let res = await authAPI().get(endpoints["orders"]);
+      if (res.status === 200) {
+        console.log(res.data);
+        setOrder(res.data);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -145,7 +158,9 @@ const Header = () => {
               aria-expanded={openNofi ? "true" : undefined}
               onClick={handleClickNofi}
             >
-              <NotificationsActiveIcon color="warning" fontSize="small" />
+              <Badge badgeContent={order.length} color="error">
+                <NotificationsActiveIcon color="warning" fontSize="small" />
+              </Badge>
             </ButtonM>
             <Menu
               style={{
@@ -161,151 +176,158 @@ const Header = () => {
                 "aria-labelledby": "basic-button",
               }}
             >
-              {order.map((o) => (
-                <MenuItem onClick={handleCloseNofi}>
-                  {o.order_status == 0 ? (
-                    <div>
-                      <ListItem style={{ padding: 0 }}>
-                        <ListItemText
+              {order.length > 0 ? (
+                order.map((o) => (
+                  <MenuItem onClick={handleCloseNofi}>
+                    {o.order_status == 0 ? (
+                      <div>
+                        <ListItem style={{ padding: 0 }}>
+                          <ListItemText
+                            style={{
+                              display: "flex",
+                              height: "auto",
+                              whiteSpace: "wrap",
+                            }}
+                            secondary={
+                              <PendingActionsIcon
+                                style={{
+                                  color: "red",
+                                  fontSize: 16,
+                                  marginLeft: 5,
+                                }}
+                              />
+                            }
+                            primary="Đơn hàng chưa được xác nhận"
+                          />
+                          <caption
+                            style={{
+                              fontSize: 12,
+                              fontStyle: "italic",
+                              marginLeft: 5,
+                            }}
+                          >
+                            <Moment fromNow>{o.created_date}</Moment>
+                          </caption>
+                        </ListItem>
+                        <Typography
+                          color="text.secondary"
+                          variant="body2"
                           style={{
-                            display: "flex",
+                            width: "350px",
+                            marginBottom: 10,
                             height: "auto",
-                            whiteSpace: "wrap",
-                          }}
-                          secondary={
-                            <PendingActionsIcon
-                              style={{
-                                color: "red",
-                                fontSize: 16,
-                                marginLeft: 5,
-                              }}
-                            />
-                          }
-                          primary="Đơn hàng chưa được xác nhận"
-                        />
-                        <caption
-                          style={{
-                            fontSize: 12,
-                            fontStyle: "italic",
-                            marginLeft: 5,
+                            whiteSpace: "break-spaces",
                           }}
                         >
-                          <Moment fromNow>{o.created_date}</Moment>
-                        </caption>
-                      </ListItem>
-                      <Typography
-                        color="text.secondary"
-                        variant="body2"
-                        style={{
-                          width: "350px",
-                          marginBottom: 10,
-                          height: "auto",
-                          whiteSpace: "break-spaces",
-                        }}
-                      >
-                        Bạn đã đặt thành công đơn hàng với tổng tiền{" "}
-                        {numberWithCommas(o.amount)} VNĐ, sẽ được giao cho{" "}
-                        {o.receiver_name} tại địa chỉ {o.receiver_address}.
-                      </Typography>
-                      <Divider component="li" />
-                    </div>
-                  ) : null}
-                  {o.order_status == 1 ? (
-                    <div>
-                      <ListItem style={{ padding: 0 }}>
-                        <ListItemText
+                          Bạn đã đặt thành công đơn hàng với tổng tiền{" "}
+                          {numberWithCommas(o.amount)} VNĐ, sẽ được giao cho{" "}
+                          {o.receiver_name} tại địa chỉ {o.receiver_address}.
+                        </Typography>
+                        <Divider component="li" />
+                      </div>
+                    ) : null}
+                    {o.order_status == 1 ? (
+                      <div>
+                        <ListItem style={{ padding: 0 }}>
+                          <ListItemText
+                            style={{
+                              display: "flex",
+                              height: "auto",
+                              whiteSpace: "wrap",
+                            }}
+                            secondary={
+                              <DeliveryDiningIcon
+                                style={{
+                                  color: "orange",
+                                  fontSize: 16,
+                                  marginLeft: 5,
+                                }}
+                              />
+                            }
+                            primary="Đơn hàng đang giao đến bạn"
+                          />
+                          <caption
+                            style={{
+                              fontSize: 12,
+                              fontStyle: "italic",
+                              marginLeft: 5,
+                            }}
+                          >
+                            <Moment fromNow>{o.payment_date}</Moment>
+                          </caption>
+                        </ListItem>
+                        <Typography
+                          color="text.secondary"
+                          variant="body2"
                           style={{
-                            display: "flex",
+                            width: "350px",
+                            marginBottom: 10,
                             height: "auto",
-                            whiteSpace: "wrap",
-                          }}
-                          secondary={
-                            <DeliveryDiningIcon
-                              style={{
-                                color: "orange",
-                                fontSize: 16,
-                                marginLeft: 5,
-                              }}
-                            />
-                          }
-                          primary="Đơn hàng đang giao đến bạn"
-                        />
-                        <caption
-                          style={{
-                            fontSize: 12,
-                            fontStyle: "italic",
-                            marginLeft: 5,
+                            whiteSpace: "break-spaces",
                           }}
                         >
-                          <Moment fromNow>{o.payment_date}</Moment>
-                        </caption>
-                      </ListItem>
-                      <Typography
-                        color="text.secondary"
-                        variant="body2"
-                        style={{
-                          width: "350px",
-                          marginBottom: 10,
-                          height: "auto",
-                          whiteSpace: "break-spaces",
-                        }}
-                      >
-                        Đơn hàng có tổng tiền {numberWithCommas(o.amount)} VNĐ
-                        đang được giao đến bạn tại địa chỉ {o.receiver_address}!
-                      </Typography>
-                      <Divider component="li" />
-                    </div>
-                  ) : null}
-                  {o.order_status == 2 ? (
-                    <div>
-                      <ListItem style={{ padding: 0 }}>
-                        <ListItemText
+                          Đơn hàng có tổng tiền {numberWithCommas(o.amount)} VNĐ
+                          đang được giao đến bạn tại địa chỉ{" "}
+                          {o.receiver_address}!
+                        </Typography>
+                        <Divider component="li" />
+                      </div>
+                    ) : null}
+                    {o.order_status == 2 ? (
+                      <div>
+                        <ListItem style={{ padding: 0 }}>
+                          <ListItemText
+                            style={{
+                              display: "flex",
+                              height: "auto",
+                              whiteSpace: "wrap",
+                            }}
+                            secondary={
+                              <CreditScoreIcon
+                                style={{
+                                  color: "green",
+                                  fontSize: 16,
+                                  marginLeft: 5,
+                                }}
+                              />
+                            }
+                            primary="Đơn hàng giao thành công"
+                          />
+                          <caption
+                            style={{
+                              fontSize: 12,
+                              fontStyle: "italic",
+                              marginLeft: 5,
+                            }}
+                          >
+                            <Moment fromNow>{o.payment_date}</Moment>
+                          </caption>
+                        </ListItem>
+                        <Typography
+                          color="text.secondary"
+                          variant="body2"
                           style={{
-                            display: "flex",
+                            width: "350px",
+                            marginBottom: 10,
                             height: "auto",
-                            whiteSpace: "wrap",
-                          }}
-                          secondary={
-                            <CreditScoreIcon
-                              style={{
-                                color: "green",
-                                fontSize: 16,
-                                marginLeft: 5,
-                              }}
-                            />
-                          }
-                          primary="Đơn hàng giao thành công"
-                        />
-                        <caption
-                          style={{
-                            fontSize: 12,
-                            fontStyle: "italic",
-                            marginLeft: 5,
+                            whiteSpace: "break-spaces",
                           }}
                         >
-                          <Moment fromNow>{o.payment_date}</Moment>
-                        </caption>
-                      </ListItem>
-                      <Typography
-                        color="text.secondary"
-                        variant="body2"
-                        style={{
-                          width: "350px",
-                          marginBottom: 10,
-                          height: "auto",
-                          whiteSpace: "break-spaces",
-                        }}
-                      >
-                        Đơn hàng có tổng tiền {numberWithCommas(o.amount)} VNĐ
-                        của bạn đã được giao vào lúc{" "}
-                        <Moment fromNow>{o.payment_date}</Moment> tại{" "}
-                        {o.receiver_address}.
-                      </Typography>
-                      <Divider component="li" />
-                    </div>
-                  ) : null}
-                </MenuItem>
-              ))}
+                          Đơn hàng có tổng tiền {numberWithCommas(o.amount)} VNĐ
+                          của bạn đã được giao vào lúc{" "}
+                          <Moment fromNow>{o.payment_date}</Moment> tại{" "}
+                          {o.receiver_address}.
+                        </Typography>
+                        <Divider component="li" />
+                      </div>
+                    ) : null}
+                  </MenuItem>
+                ))
+              ) : (
+                <caption style={{ width: 250, textAlign: "center" }}>
+                  Bạn không có thông báo nào!
+                </caption>
+              )}
             </Menu>
           </div>
         ) : null}

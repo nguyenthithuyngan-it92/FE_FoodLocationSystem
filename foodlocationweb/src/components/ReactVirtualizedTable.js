@@ -205,6 +205,11 @@ export default function ReactVirtualizedTable(props) {
         case "order_status":
           return renderByStatus(row[dataKey]);
         case "action_v1":
+          const disabled =
+            row &&
+            Object.prototype.hasOwnProperty.call(row, "food_count") &&
+            Number(row.food_count) !== 0;
+
           return (
             <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
               <Tooltip title="Chuyển trạng thái">
@@ -243,7 +248,13 @@ export default function ReactVirtualizedTable(props) {
                 <Button
                   size="small"
                   variant="outlined"
-                  style={{ minWidth: 50, color: "red", borderColor: "red" }}
+                  disabled={disabled}
+                  style={{
+                    minWidth: 50,
+                    color: "red",
+                    borderColor: "red",
+                    opacity: disabled ? 0.3 : 1,
+                  }}
                   onClick={() => {
                     if (typeof column.service === "function") {
                       column.service(ACTION_TYPES_V1.DELETE, row);

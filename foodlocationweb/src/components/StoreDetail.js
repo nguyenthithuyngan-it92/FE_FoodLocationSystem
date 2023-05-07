@@ -30,7 +30,7 @@ import Stack from "@mui/material/Stack";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import { isValidTime } from "../utils";
 import CustomizedBadges from "./Cart";
-import { Tooltip } from "@mui/material";
+import { Alert, Tooltip } from "@mui/material";
 import { UserContext } from "../configs/MyContext";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 
@@ -139,7 +139,7 @@ const StoreDetail = () => {
       }
     } else {
       const itemParse = JSON.parse(itemStorage);
-      const storeIdExisted = itemParse[0].store_id;
+      const storeIdExisted = itemParse[0] && itemParse[0].store_id;
 
       // console.log("itemParse :>", itemParse);
       if (storeIdExisted !== parseInt(storeId)) {
@@ -370,16 +370,26 @@ const StoreDetail = () => {
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>Cảnh báo</DialogTitle>
+        <DialogTitle style={{ color: "red", fontWeight: "bold" }}>
+          Cảnh báo
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
+          <DialogContentText id="alert-dialog-slide-dFescription">
             Trong giỏ hàng đã có món ăn của cửa hàng khác. Bạn có muốn xóa những
             món trong giỏ hàng không?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Tắt thông báo</Button>
-          <Button onClick={() => handleAddToCart(cacheFood, true)}>
+          <Button
+            style={{ color: "red", border: "1px solid red" }}
+            onClick={handleClose}
+          >
+            Tắt thông báo
+          </Button>
+          <Button
+            style={{ color: "green", border: "1px solid green" }}
+            onClick={() => handleAddToCart(cacheFood, true)}
+          >
             Đồng ý
           </Button>
         </DialogActions>

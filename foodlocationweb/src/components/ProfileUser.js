@@ -26,13 +26,13 @@ const ProfileUser = () => {
   };
 
   const [userEdit, setUser] = useState({
-    first_name: user.first_name,
-    last_name: user.last_name,
-    username: user.username,
-    email: user.email,
-    phone: user.phone,
-    address: user.address,
-    name_store: user.name_store,
+    first_name: user ? user.first_name : "",
+    last_name: user ? user.last_name : "",
+    username: user ? user.username : "",
+    email: user ? user.email : "",
+    phone: user ? user.phone : "",
+    address: user ? user.address : "",
+    name_store: user ? user.name_store : "",
   });
 
   const editUser = async (evt) => {
@@ -59,7 +59,7 @@ const ProfileUser = () => {
         },
       });
       if (res.status === 200) {
-        setUser((pre) => pre + 1);
+        // setUser((pre) => pre + 1);
 
         setOpenMess(true);
         setMess("Cập nhật thông tin thành công!");
@@ -84,7 +84,7 @@ const ProfileUser = () => {
   return (
     <>
       {/* MESSAGE */}
-      {user !== null ? (
+      {user ? (
         <div>
           <Snackbar
             open={openMess}

@@ -15,7 +15,7 @@ function Map({ location }) {
         id="marker-example"
         mapContainerStyle={containerStyle}
         center={location.center}
-        zoom={20}
+        zoom={18}
       >
         <Marker position={location.position} />
       </GoogleMap>

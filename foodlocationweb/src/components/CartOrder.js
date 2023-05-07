@@ -45,6 +45,7 @@ const CartOrder = () => {
   const [searchParams] = useSearchParams();
   const [mess, setMess] = useState(null);
   const [openMess, setOpenMess] = useState(false);
+  const [err, setErr] = useState();
 
   const handleCloseMess = (event, reason) => {
     if (reason === "clickaway") {
@@ -204,6 +205,25 @@ const CartOrder = () => {
   const addOrder = async (e) => {
     e.preventDefault();
     setLoading(true);
+    let isValid = true;
+
+    if (formOrder.receiver_name === "") {
+      setErr("Phải nhập tên người nhận!");
+      isValid = false;
+    } else if (formOrder.receiver_phone === "") {
+      setErr("Phải nhập số điện thoại người nhận!");
+      isValid = false;
+    } else if (formOrder.receiver_address === "") {
+      setErr("Phải nhập địa chỉ nhận hàng!");
+      isValid = false;
+    } else if (formOrder.paymentmethod === "") {
+      setErr("Phải nhập chọn phương thức thanh toán!");
+      isValid = false;
+    }
+    if (!isValid) {
+      setLoading(false);
+      return;
+    }
 
     try {
       let storeId = null;
@@ -314,6 +334,7 @@ const CartOrder = () => {
           <Divider color="gray" />
           <div style={{ border: "1px solid", margin: 10, borderRadius: 5 }}>
             <h6 style={{ margin: 10, color: "gray" }}>Thông tin giao hàng</h6>
+            {err ? <Alert severity="error">{err}</Alert> : ""}
             <div style={{ margin: 10, display: "flex" }}>
               <div style={{ width: "50%", margin: 10 }}>
                 <InputFormUser

@@ -163,7 +163,7 @@ const StoreFeedback = () => {
           border: "1px solid",
           borderRadius: 5,
           margin: 10,
-          height: 400,
+          height: 200,
         }}
       >
         <div
