@@ -169,7 +169,7 @@ const ProfileUser = () => {
                   setUser({ ...userEdit, phone: e.target.value })
                 }
               />
-              {user.user_role == 1 ? (
+              {Number(user.user_role) === 1 ? (
                 <>
                   <InputFormUser
                     label="Tên cửa hàng"

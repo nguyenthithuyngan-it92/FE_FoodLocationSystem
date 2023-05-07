@@ -297,7 +297,7 @@ const CartOrder = () => {
 
   return (
     <>
-      {!user || user.user_role == 0 ? (
+      {!user || Number(user.user_role) === 0 ? (
         <div>
           {/* MESSAGE */}
           <Snackbar

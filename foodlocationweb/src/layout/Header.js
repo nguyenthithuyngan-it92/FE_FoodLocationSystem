@@ -33,12 +33,11 @@ import Moment from "react-moment";
 import { numberWithCommas } from "../utils/converters";
 
 const Header = () => {
-    
-    const [user, dispatch] = useContext(UserContext)
-    const [name, setName] = useState()
-    const [price, setPrice] = useState()
-    const nav = useNavigate()
-    const [order, setOrder] = useState([]);
+  const [user, dispatch] = useContext(UserContext);
+  const [name, setName] = useState();
+  const [price, setPrice] = useState();
+  const nav = useNavigate();
+  const [order, setOrder] = useState([]);
 
   useEffect(() => {
     const timmerId = setInterval(() => {
@@ -88,25 +87,21 @@ const Header = () => {
     setAnchorE2(null);
   };
 
-  
-
   const search = (evt) => {
-        evt.preventDefault()
-        if (name)
-          nav(`/food/?name=${name}`)
-          
-        if (price)
-          nav(`/food/?price=${price}`)
+    evt.preventDefault();
+    if (name) nav(`/food/?name=${name}`);
 
-        // if (tags)
-        //   nav(`/food/?tags=${tags}`) 
-    }
+    if (price) nav(`/food/?price=${price}`);
+
+    // if (tags)
+    //   nav(`/food/?tags=${tags}`)
+  };
 
   const logout = () => {
-        dispatch({
-            "type": "logout"
-        })
-    }
+    dispatch({
+      type: "logout",
+    });
+  };
 
   let userInfo = (
     <>
@@ -154,7 +149,7 @@ const Header = () => {
     userInfo = (
       <>
         {/* NOTIFICATION ORDER */}
-        {user.user_role === 0 && user.is_superuser != 1 ? (
+        {Number(user.user_role) === 0 && Number(user.is_superuser) !== 1 ? (
           <div>
             <ButtonM
               id="basic-button"
@@ -185,7 +180,7 @@ const Header = () => {
               {order.length > 0 ? (
                 order.map((o) => (
                   <MenuItem onClick={handleCloseNofi}>
-                    {o.order_status == 0 ? (
+                    {Number(o.order_status) === 0 ? (
                       <div>
                         <ListItem style={{ padding: 0 }}>
                           <ListItemText
@@ -232,7 +227,7 @@ const Header = () => {
                         <Divider component="li" />
                       </div>
                     ) : null}
-                    {o.order_status == 1 ? (
+                    {Number(o.order_status) === 1 ? (
                       <div>
                         <ListItem style={{ padding: 0 }}>
                           <ListItemText
@@ -279,7 +274,7 @@ const Header = () => {
                         <Divider component="li" />
                       </div>
                     ) : null}
-                    {o.order_status == 2 ? (
+                    {Number(o.order_status) === 2 ? (
                       <div>
                         <ListItem style={{ padding: 0 }}>
                           <ListItemText
@@ -347,12 +342,20 @@ const Header = () => {
             onClick={handleClick}
           >
             <Avatar alt={user.username} src={user.image} />
-            {user.user_role === 0 ? (
-              <Link to="#" className="nav-link text-info">
+            {Number(user.user_role) === 0 ? (
+              <Link
+                to="#"
+                className="nav-link text-info"
+                style={{ fontSize: "12px" }}
+              >
                 Xin chào, {user.first_name}
               </Link>
             ) : (
-              <Link to="#" className="nav-link text-info">
+              <Link
+                to="#"
+                className="nav-link text-info"
+                style={{ fontSize: "12px" }}
+              >
                 Xin chào, {user.name_store}
               </Link>
             )}
@@ -365,7 +368,7 @@ const Header = () => {
             MenuListProps={{ "aria-labelledby": "basic-button" }}
           >
             <MenuItem onClick={handleClose}>
-              {user.user_role === 1 ? (
+              {Number(user.user_role) === 1 ? (
                 <Link to="/store-management" className="nav-link text-success">
                   <ManageAccountsIcon fontSize="small" /> Quản lý cửa hàng
                 </Link>
@@ -375,7 +378,7 @@ const Header = () => {
             </MenuItem>
 
             <MenuItem onClick={handleClose}>
-              {user.is_superuser == 1 ? (
+              {Number(user.is_superuser) === 1 ? (
                 <a
                   href="http://127.0.0.1:8000/admin/"
                   className="nav-link text-primary"
@@ -398,45 +401,50 @@ const Header = () => {
       </>
     );
 
-    return (
-        <>
-        <Navbar bg="light" expand="lg">
-            <Container>
-                <Navbar.Brand href="#home">Địa Điểm Ăn Uống</Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                <Nav className="me-auto" style={{ alignItems: "center" }}>
-                    <Link to="/" className="nav-link active">&#127968; Trang chủ</Link>
-                    
-                    {/* {tags.map(t => <Nav.Link href="#link">{t.name}</Nav.Link>)} */}
+  return (
+    <>
+      <Navbar bg="light" expand="lg">
+        <Container>
+          <Navbar.Brand href="#home">Địa Điểm Ăn Uống</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto" style={{ alignItems: "center" }}>
+              <Link to="/" style={{ textDecoration: "none", fontSize: "16px" }}>
+                <HomeIcon fontSize="small"></HomeIcon> Trang chủ
+              </Link>
 
-                    {userInfo}
-                    
-                </Nav>
-                <Form onSubmit={search} className="d-flex">
-                  <Form.Control
-                    type="search"
-                    placeholder="Tìm kiếm theo tên món ăn..."
-                    className="me-2"
-                    aria-label="Search"
-                    value={name}
-                    onChange={evt => setName(evt.target.value)}
-                  />
-                  <Form.Control
-                    type="search"
-                    placeholder="Tìm kiếm theo giá món ăn..."
-                    className="me-2"
-                    aria-label="Search"
-                    value={price}
-                    onChange={evt => setPrice(evt.target.value)}
-                  />
-                  <Button type="submit" variant="outline-success">Tìm</Button>
-                </Form>
-                </Navbar.Collapse>
-            </Container>
-        </Navbar>
-        </>
-    )
-}
+              {/* {tags.map(t => <Nav.Link href="#link">{t.name}</Nav.Link>)} */}
 
-export default Header
+              {userInfo}
+            </Nav>
+            <Form onSubmit={search} className="d-flex">
+              <Form.Control
+                type="search"
+                placeholder="Tìm theo tên món ăn..."
+                className="me-2"
+                aria-label="Search"
+                style={{ maxWidth: "150px" }}
+                value={name}
+                onChange={(evt) => setName(evt.target.value)}
+              />
+              <Form.Control
+                type="search"
+                placeholder="Tìm theo giá món ăn..."
+                className="me-2"
+                aria-label="Search"
+                style={{ maxWidth: "150px" }}
+                value={price}
+                onChange={(evt) => setPrice(evt.target.value)}
+              />
+              <Button type="submit" variant="outline-success">
+                Tìm
+              </Button>
+            </Form>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+    </>
+  );
+};
+
+export default Header;

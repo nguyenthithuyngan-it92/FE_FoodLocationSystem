@@ -231,7 +231,7 @@ const StoreDetail = () => {
               }
             />
 
-            {!user || user.user_role == 1 ? (
+            {!user || Number(user.user_role) === 1 ? (
               <Tooltip title="Vui lòng đăng nhập tài khoản khách hàng">
                 <IconButton
                   color="success"
@@ -263,78 +263,86 @@ const StoreDetail = () => {
   return (
     <>
       {/* INFO FOOD DETAIL */}
-      <Card sx={{ display: "flex", margin: "10px" }}>
-        <CardMedia
-          component="img"
-          src={food.image}
-          alt={food.name}
-          sx={{ width: 250, height: 250, objectFit: "cover", margin: "25px" }}
-        />
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <CardContent sx={{ flex: "1 0 auto" }}>
-            <Typography
-              component="div"
-              variant="h4"
-              sx={{ flex: "1 0 auto", marginTop: "5px" }}
-            >
-              {food.name}{" "}
-              <Tooltip title="Xem chi tiết cửa hàng">
-                <Link
-                  to={`/stores/${food.menu_item.store.id}`}
-                  style={{ textDecoration: "none" }}
-                >
-                  <span style={{ fontSize: 24, color: "gray" }}>
-                    - {food.menu_item.store.name_store}{" "}
-                    <StorefrontIcon style={{ fontSize: 20, marginBottom: 5 }} />
-                  </span>
-                </Link>
-              </Tooltip>
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              color="text.secondary"
-              component="div"
-              sx={{
-                flex: "1 0 auto",
-                marginTop: "10px",
-                fontSize: "20px",
-                color: "Highlight",
-                fontWeight: "bold",
-              }}
-            >
-              <PaymentsIcon /> {numberWithCommas(food.price)} VND
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              color="text.secondary"
-              component="div"
-              sx={{
-                flex: "1 0 auto",
-                marginTop: "10px",
-                fontSize: "13px",
-                marginBottom: 2,
-              }}
-            >
-              <DescriptionIcon /> {food.description}
-            </Typography>
-            <Link to={`/foods/${food.id}`} style={{ textDecoration: "none" }}>
-              Xem thêm đánh giá món ăn
-            </Link>
+      {Object.keys(food).length > 0 && (
+        <Card sx={{ display: "flex", margin: "10px" }}>
+          <CardMedia
+            component="img"
+            src={food.image}
+            alt={food.name}
+            sx={{ width: 250, height: 250, objectFit: "cover", margin: "25px" }}
+          />
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <CardContent sx={{ flex: "1 0 auto" }}>
+              <Typography
+                component="div"
+                variant="h4"
+                sx={{ flex: "1 0 auto", marginTop: "5px" }}
+              >
+                {food.name}{" "}
+                <Tooltip title="Xem chi tiết cửa hàng">
+                  <Link
+                    to={`/stores/${food.menu_item.store.id}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <span style={{ fontSize: 24, color: "gray" }}>
+                      - {food.menu_item.store.name_store}{" "}
+                      <StorefrontIcon
+                        style={{ fontSize: 20, marginBottom: 5 }}
+                      />
+                    </span>
+                  </Link>
+                </Tooltip>
+              </Typography>
+              <Typography
+                variant="subtitle1"
+                color="text.secondary"
+                component="div"
+                sx={{
+                  flex: "1 0 auto",
+                  marginTop: "10px",
+                  fontSize: "20px",
+                  color: "Highlight",
+                  fontWeight: "bold",
+                }}
+              >
+                <PaymentsIcon /> {numberWithCommas(food.price)} VND
+              </Typography>
+              <Typography
+                variant="subtitle1"
+                color="text.secondary"
+                component="div"
+                sx={{
+                  flex: "1 0 auto",
+                  marginTop: "10px",
+                  fontSize: "13px",
+                  marginBottom: 2,
+                }}
+              >
+                <DescriptionIcon /> {food.description}
+              </Typography>
+              <Link to={`/foods/${food.id}`} style={{ textDecoration: "none" }}>
+                Xem thêm đánh giá món ăn
+              </Link>
 
-            <Stack direction="row" spacing={1} style={{ margin: "20px 10px" }}>
-              {[...(food.tags || [])].map((tag) => {
-                return (
-                  <Chip
-                    icon={<LocalOfferIcon style={{ fontSize: "12px" }} />}
-                    label={tag.name}
-                    variant="outlined"
-                  />
-                );
-              })}
-            </Stack>
-          </CardContent>
-        </Box>
-      </Card>
+              <Stack
+                direction="row"
+                spacing={1}
+                style={{ margin: "20px 10px" }}
+              >
+                {[...(food.tags || [])].map((tag) => {
+                  return (
+                    <Chip
+                      icon={<LocalOfferIcon style={{ fontSize: "12px" }} />}
+                      label={tag.name}
+                      variant="outlined"
+                    />
+                  );
+                })}
+              </Stack>
+            </CardContent>
+          </Box>
+        </Card>
+      )}
 
       {/* DANH SÁCH MENU CỦA STORE */}
       <div style={{ display: "flex" }}>

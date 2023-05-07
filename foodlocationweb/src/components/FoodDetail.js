@@ -12,14 +12,14 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import StarOutlineIcon from '@mui/icons-material/StarOutline';
+import StarOutlineIcon from "@mui/icons-material/StarOutline";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import { UserContext } from "../configs/MyContext";
 import TimerOffIcon from "@mui/icons-material/TimerOff";
 import TimerIcon from "@mui/icons-material/Timer";
 import Loading from "../layout/Loading";
 import StorefrontIcon from "@mui/icons-material/Storefront";
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
 import Moment from "react-moment";
 import { Rating } from "@mui/material";
@@ -27,74 +27,75 @@ import { Rating } from "@mui/material";
 const FoodDetail = () => {
   const [user] = useContext(UserContext);
   const [foodDetail, setFoodDetail] = useState(null);
-  const [comments, setComments] = useState(null);
-  const [loading, setLoading] = useState(false)
-  const [content, setContent] = useState("")
+  const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [content, setContent] = useState("");
   const { foodId } = useParams();
 
   useEffect(() => {
     let loadFoodDetailById = async () => {
       let res = await API.get(endpoints["food-by-id"](foodId));
       if (res.status === 200) {
-        //setFoodDetail(res.data);
+        setFoodDetail(res.data);
       }
     };
 
     loadFoodDetailById();
   }, [foodId]);
 
-
   useEffect(() => {
     const loadComments = async () => {
       let res = await API.get(endpoints["food-comments"](foodId));
       if (res.status === 200) {
-        setComments(res.data.results);
+        console.log("res :>", res);
+        setComments(res.data && res.data.results ? res.data.results : []);
       }
     };
 
     loadComments();
-  }, [comments])
+  }, []);
 
   const addComment = (evt) => {
-    evt.preventDefault()
+    evt.preventDefault();
 
     const process = async () => {
       try {
         let res = await authAPI().post(endpoints["food-comments"](foodId), {
-          "content": content
-        })
-        setComments(curr => ([res.data, ...curr]))
-        setContent("")
+          content: content,
+        });
+        setComments((curr) => [res.data, ...curr]);
+        setContent("");
       } catch {
-
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    setLoading(true)
-    process()
-  }
+    setLoading(true);
+    process();
+  };
 
   const like = () => {
     const process = async () => {
-      let res = await authAPI().post(endpoints["food-like"](foodId))
-      setFoodDetail(res.data)
-    }
+      let res = await authAPI().post(endpoints["food-like"](foodId));
+      setFoodDetail(res.data);
+    };
 
-    process()
-  }
+    process();
+  };
 
   const rating = (r) => {
     const process = async () => {
       let res = await authAPI().post(endpoints["food-rating"](foodId), {
-        "rating": r
-      })
-      setFoodDetail(res.data)
-    }
+        rating: r,
+      });
+      setFoodDetail(res.data);
+    };
 
-    process()
-  }
+    process();
+  };
+
+  console.log("comments :>", comments);
 
   if (foodDetail === null) return <Loading />;
 
@@ -214,7 +215,9 @@ const FoodDetail = () => {
               })}
             </Stack>
 
-            {user===null?"":(
+            {!user ? (
+              ""
+            ) : (
               <Typography
                 variant="subtitle1"
                 color="text.secondary"
@@ -226,12 +229,21 @@ const FoodDetail = () => {
                   marginBottom: 2,
                 }}
               >
-                <Button onClick={like} type="submit" variant={foodDetail.like===true?"danger":"outline-danger"}><FavoriteBorderIcon /></Button>
+                <Button
+                  onClick={like}
+                  type="submit"
+                  variant={
+                    foodDetail.like === true ? "danger" : "outline-danger"
+                  }
+                >
+                  <FavoriteBorderIcon />
+                </Button>
                 <div>
-                  <Rating onClick={rating}><StarOutlineIcon /></Rating>
+                  <Rating onClick={rating}>
+                    <StarOutlineIcon />
+                  </Rating>
                 </div>
               </Typography>
-
             )}
           </CardContent>
         </Box>
@@ -254,34 +266,62 @@ const FoodDetail = () => {
           }}
         >
           <hr></hr>
-          
-          {user===null? <small>Xin vui lòng <Link to={"/login"}>đăng nhập</Link> trước khi bình luận!!!</small>:(
+
+          {!user ? (
+            <small>
+              Xin vui lòng <Link to={"/login"}>đăng nhập</Link> trước khi bình
+              luận!!!
+            </small>
+          ) : (
             <Form onSubmit={addComment}>
-              <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                <Form.Control as="textarea" rows={3}
-                        value={content} required
-                        onChange={e => setContent(e.target.value)}
-                        placeholder="Nội dung bình luận...." />
-                {loading?<Loading />:<Button className="mt-2" variant="primary" type="submit">Bình luận</Button>}
+              <Form.Group
+                className="mb-3"
+                controlId="exampleForm.ControlTextarea1"
+              >
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  value={content}
+                  required
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Nội dung bình luận...."
+                />
+                {loading ? (
+                  <Loading />
+                ) : (
+                  <Button className="mt-2" variant="primary" type="submit">
+                    Bình luận
+                  </Button>
+                )}
               </Form.Group>
             </Form>
           )}
 
           <hr></hr>
 
-          {comments===null?<Loading />:(
-            comments.map(c => {
+          {comments.length === 0 ? (
+            <p>Không có bình luận nào</p>
+          ) : (
+            comments.map((c) => {
               return (
                 <Row className="bg-light m-1">
                   <Col md={1} xs={3}>
-                    <Image src={c.user.image} alt={c.user.username} rounded fluid />
+                    <Image
+                      src={c.user.image}
+                      alt={c.user.username}
+                      rounded
+                      fluid
+                    />
                   </Col>
                   <Col md={11} xs={9}>
                     <p>{c.content}</p>
-                    <small>Bình luận bởi <Link>{c.user.username}</Link> lúc <Moment fromNow>{c.created_date}</Moment></small>
+                    <small>
+                      Bình luận bởi <Link>{c.user.username}</Link> lúc{" "}
+                      <Moment fromNow>{c.created_date}</Moment>
+                    </small>
                   </Col>
                 </Row>
-              )
+              );
             })
           )}
         </div>
