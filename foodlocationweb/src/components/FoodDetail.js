@@ -22,7 +22,10 @@ import StorefrontIcon from "@mui/icons-material/Storefront";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { Button, Col, Form, Image, Row } from "react-bootstrap";
 import Moment from "react-moment";
-import { Rating } from "@mui/material";
+import { Avatar } from "@mui/material";
+import Rating from "react-rating";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import StarIcon from "@mui/icons-material/Star";
 
 const FoodDetail = () => {
   const [user] = useContext(UserContext);
@@ -31,6 +34,7 @@ const FoodDetail = () => {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
   const { foodId } = useParams();
+  const [refresher, setRefresher] = useState(1);
 
   useEffect(() => {
     let loadFoodDetailById = async () => {
@@ -46,25 +50,29 @@ const FoodDetail = () => {
   useEffect(() => {
     const loadComments = async () => {
       let res = await API.get(endpoints["food-comments"](foodId));
+      console.info(res.data);
       if (res.status === 200) {
-        console.log("res :>", res);
-        setComments(res.data && res.data.results ? res.data.results : []);
+        setComments(res.data);
       }
     };
 
     loadComments();
-  }, []);
+  }, [foodId, refresher]);
 
   const addComment = (evt) => {
     evt.preventDefault();
 
     const process = async () => {
       try {
-        let res = await authAPI().post(endpoints["food-comments"](foodId), {
+        let res = await authAPI().post(endpoints["add-comment"](foodId), {
           content: content,
         });
-        setComments((curr) => [res.data, ...curr]);
-        setContent("");
+        // console.info(res);
+        // setComments((curr) => [res.data, ...curr]);
+        if (res.status === 201) {
+          setRefresher((pre) => pre + 1);
+          setContent("");
+        }
       } catch {
       } finally {
         setLoading(false);
@@ -87,9 +95,14 @@ const FoodDetail = () => {
   const rating = (r) => {
     const process = async () => {
       let res = await authAPI().post(endpoints["food-rating"](foodId), {
-        rating: r,
+        rate: r,
       });
-      setFoodDetail(res.data);
+      console.info(res);
+      if (res.status === 200) {
+        setRefresher((pre) => pre + 1);
+        // setFoodDetail(res.data);
+      }
+      // setFoodDetail(res.data);
     };
 
     process();
@@ -144,7 +157,9 @@ const FoodDetail = () => {
                     marginBottom: 2,
                   }}
                 >
-                  <StorefrontIcon /> {foodDetail.menu_item.store.name_store}
+                  <StorefrontIcon />{" "}
+                  {Object.keys(foodDetail).length > 0 &&
+                    foodDetail.menu_item.store.name_store}
                 </Typography>
                 <Typography
                   variant="subtitle1"
@@ -157,7 +172,9 @@ const FoodDetail = () => {
                     marginBottom: 2,
                   }}
                 >
-                  <MenuBookIcon /> {foodDetail.menu_item.name}
+                  <MenuBookIcon />{" "}
+                  {Object.keys(foodDetail).length > 0 &&
+                    foodDetail.menu_item.name}
                 </Typography>
               </div>
               <div style={{ width: "30%", marginLeft: 10 }}>
@@ -239,9 +256,12 @@ const FoodDetail = () => {
                   <FavoriteBorderIcon />
                 </Button>
                 <div>
-                  <Rating onClick={rating}>
-                    <StarOutlineIcon />
-                  </Rating>
+                  <Rating
+                    initialRating={Number(foodDetail.rate)}
+                    onClick={rating}
+                    emptySymbol={<StarBorderIcon />}
+                    fullSymbol={<StarIcon style={{ color: "orange" }} />}
+                  />
                 </div>
               </Typography>
             )}
@@ -253,7 +273,6 @@ const FoodDetail = () => {
           border: "1px solid",
           borderRadius: 5,
           margin: 10,
-          height: 400,
         }}
       >
         <div
@@ -306,7 +325,7 @@ const FoodDetail = () => {
               return (
                 <Row className="bg-light m-1">
                   <Col md={1} xs={3}>
-                    <Image
+                    <Avatar
                       src={c.user.image}
                       alt={c.user.username}
                       rounded
@@ -314,10 +333,13 @@ const FoodDetail = () => {
                     />
                   </Col>
                   <Col md={11} xs={9}>
-                    <p>{c.content}</p>
-                    <small>
-                      Bình luận bởi <Link>{c.user.username}</Link> lúc{" "}
-                      <Moment fromNow>{c.created_date}</Moment>
+                    <p style={{ marginBottom: "5px" }}>{c.content}</p>
+                    <small style={{ fontSize: "12px" }}>
+                      Bình luận bởi{" "}
+                      <Link style={{ textDecoration: "none", color: "gray" }}>
+                        {c.user.username}
+                      </Link>{" "}
+                      lúc <Moment fromNow>{c.created_date}</Moment>
                     </small>
                   </Col>
                 </Row>
