@@ -1,7 +1,7 @@
-import { useState, useContext, useEffect, useMemo, useRef } from "react";
+import React, { useState, useContext, useEffect, useMemo, useRef } from "react";
 import API, { authAPI, endpoints } from "../configs/API";
 import { UserContext } from "../configs/MyContext";
-import { Button, Divider } from "@mui/material";
+import { Button, DialogContentText, Divider } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
@@ -31,6 +31,11 @@ import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SaveIcon from "@mui/icons-material/Save";
 import Snackbar from "@mui/material/Snackbar";
+import Slide from "@mui/material/Slide";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -147,15 +152,16 @@ const StoreManagement = () => {
       label: "Hành động",
       dataKey: "action_v2",
       numeric: false,
-      service: (data) => handleConfirmOrder(data),
+      service: (data) => handleClickOpenConfirm(data.id),
     },
   ];
 
   const [user] = useContext(UserContext);
   const [open, setOpen] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
   const [dataTable, setDataTable] = useState([]);
   const [isEditData, setIsEditData] = useState(false);
+  const [cacheId, setCacheId] = useState(null);
   const [cacheEditId, setCacheEditId] = useState(null);
   const [selectedMenuItem, setSelectedMenuItem] = useState(MAP_INDEX_MENU.MENU);
   const [menu, setMenu] = useState([]);
@@ -193,8 +199,13 @@ const StoreManagement = () => {
   const handleClose = () => {
     setOpen(false);
   };
-  const handleCloseEdit = () => {
-    setOpenEdit(false);
+
+  const handleClickOpenConfirm = (id) => {
+    setCacheId(id);
+    setOpenConfirm(true);
+  };
+  const handleCloseConfirm = () => {
+    setOpenConfirm(false);
   };
 
   const [openMess, setOpenMess] = useState(false);
@@ -218,7 +229,7 @@ const StoreManagement = () => {
 
   useEffect(() => {
     fetchListMenu();
-  }, [user]);
+  }, [user, refresher]);
 
   useEffect(() => {
     const loadTags = async () => {
@@ -268,7 +279,8 @@ const StoreManagement = () => {
                 // console.log(paymentmethod);
                 return {
                   ...restInfo,
-                  paymentmethod_name: paymentmethod.name || "Tiền mặt",
+                  paymentmethod_name:
+                    Number(paymentmethod) === 2 ? "MoMo" : "Tiền mặt",
                 };
               }),
             };
@@ -497,6 +509,30 @@ const StoreManagement = () => {
   const addFood = async (e) => {
     e.preventDefault();
     setLoading(true);
+    let isValid = true;
+
+    if (formFood.name === "") {
+      setErr("Phải nhập tên món ăn!");
+      isValid = false;
+    } else if (formFood.price === "") {
+      setErr("Phải nhập giá bán!");
+      isValid = false;
+    } else if (formFood.menu_item === "") {
+      setErr("Phải chọn danh mục món ăn!");
+      isValid = false;
+    } else if (image_food.current.files.length === 0) {
+      setErr("Phải chọn ảnh món ăn!");
+      isValid = false;
+    } else if (formFood.start_time === "" || formFood.end_time === "") {
+      setErr("Phải chọn thời gian bán!");
+      isValid = false;
+    }
+
+    if (!isValid) {
+      setLoading(false);
+      return;
+    }
+
     try {
       let form = new FormData();
       form.append("name", formFood.name);
@@ -534,11 +570,6 @@ const StoreManagement = () => {
           navigate("/store-management");
         } else setErr("Hệ thống bị lỗi! Vui lòng quay lại sau");
       }
-      if (formFood.name === "") setErr("Phải nhập tên món ăn!");
-      else if (formFood.price === "") setErr("Phải nhập giá bán!");
-      else if (formFood.menu_item === "") setErr("Phải chọn danh mục món ăn!");
-      else if (image_food.current.files.length === 0)
-        setErr("Phải chọn ảnh món ăn!");
     } catch (ex) {
       let e = "";
       for (let d of Object.values(ex.response.data)) e += `${d} <br />`;
@@ -652,6 +683,42 @@ const StoreManagement = () => {
   };
 
   // ACTION MENU (EDIT, DELETE, CHANGE_STATUS)
+  const handleActionConfirm = async () => {
+    try {
+      let res;
+      if (
+        [MAP_INDEX_MENU.FOOD, MAP_INDEX_MENU.MENU].includes(selectedMenuItem)
+      ) {
+        const url =
+          MAP_INDEX_MENU.FOOD === selectedMenuItem
+            ? "action-food"
+            : "action-menu";
+        res = await authAPI().delete(endpoints[url](cacheId));
+      }
+
+      if (
+        [MAP_INDEX_MENU.NOT_ACCEPTED, MAP_INDEX_MENU.DELIVERING].includes(
+          selectedMenuItem
+        )
+      ) {
+        res = await authAPI().post(endpoints["confirm-order"](cacheId));
+      }
+
+      if (res && res.status === 200) {
+        setMess(res.data.message);
+        setCacheId(null);
+        setOpenMess(true);
+        setRefresher((pre) => pre + 1);
+      }
+      setOpenConfirm(false);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ACTION MENU (EDIT, DELETE, CHANGE_STATUS)
   const handleActionMenu = async (type, data) => {
     try {
       let res;
@@ -659,7 +726,8 @@ const StoreManagement = () => {
         res = await authAPI().post(endpoints["status-menu"](data.id));
       }
       if (type === ACTION_TYPES_V1.DELETE) {
-        res = await authAPI().delete(endpoints["action-menu"](data.id));
+        handleClickOpenConfirm(data.id);
+        return;
       }
       if (type === ACTION_TYPES_V1.EDIT) {
         setIsEditData(true);
@@ -690,7 +758,8 @@ const StoreManagement = () => {
         res = await authAPI().post(endpoints["status-food"](data.id));
       }
       if (type === ACTION_TYPES_V1.DELETE) {
-        res = await authAPI().delete(endpoints["action-food"](data.id));
+        handleClickOpenConfirm(data.id);
+        return;
       }
       if (type === ACTION_TYPES_V1.EDIT) {
         // console.log("data clicked :>", data);
@@ -853,6 +922,37 @@ const StoreManagement = () => {
             Hủy
           </Button>
           {renderButtonAdd(selectedMenuItem, isEditData)}
+        </DialogActions>
+      </Dialog>
+      {/* DIALOG THÔNG BÁO SET STATUS _ DELETE */}
+      <Dialog
+        open={openConfirm}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleCloseConfirm}
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle style={{ color: "red", fontWeight: "bold" }}>
+          Cảnh báo
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-dFescription">
+            Bạn có chắc chắn muốn thực hiện hành động này?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            style={{ color: "red", border: "1px solid red" }}
+            onClick={handleCloseConfirm}
+          >
+            Hủy
+          </Button>
+          <Button
+            style={{ color: "green", border: "1px solid green" }}
+            onClick={() => handleActionConfirm()}
+          >
+            Đồng ý
+          </Button>
         </DialogActions>
       </Dialog>
     </>
