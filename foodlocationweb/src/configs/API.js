@@ -5,7 +5,8 @@ export const endpoints = {
   tags: "/tags/",
   foods: "/foods/",
   "food-by-id": (foodId) => `/foods/${foodId}/`, //lấy thông tin food detail
-  "food-comments": (foodId) => `/foods/${foodId}/comments/`, //bình luận món ăn
+  "food-comments": (foodId) => `/foods/${foodId}/comments/`, // get bình luận món ăn
+  "add-comment": (foodId) => `/foods/${foodId}/add-comment/`,
   "food-like": (foodId) => `/foods/${foodId}/like/`, //thích món ăn
   "food-rating": (foodId) => `/foods/${foodId}/rating/`, //đánh giá món ăn
   stores: "/stores/", //chưa dùng
@@ -42,7 +43,6 @@ export const endpoints = {
 
   "get-location": (location) =>
     `https://nominatim.openstreetmap.org/search?q=${location}&format=json`,
-
 };
 
 export const authAPI = () =>
