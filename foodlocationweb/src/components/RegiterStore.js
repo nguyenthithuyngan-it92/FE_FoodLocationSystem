@@ -5,6 +5,7 @@ import API, { endpoints } from "../configs/API";
 import InputFormUser from "../layout/InputFormUser";
 import Loading from "../layout/Loading";
 
+
 import Alert from "@mui/material/Alert";
 
 const RegisterStore = () => {
@@ -64,7 +65,7 @@ const RegisterStore = () => {
     if (user.username === "" || user.password === "")
       setErr("Username hoặc password phải nhập!");
     else if (user.password !== user.confirmPassword)
-      setErr("Mật khẩu xác nhận không khớp!");
+    setErr("Mật khẩu xác nhận không khớp!");
     else if (user.name_store === "") setErr("Phải nhập tên cửa hàng!");
     else if (user.address === "") setErr("Phải nhập địa chỉ cửa hàng!");
     else if (avatar.current.files.length === 0)
@@ -84,7 +85,7 @@ const RegisterStore = () => {
       </h1>
 
       {err ? <Alert severity="error">{err}</Alert> : ""}
-
+      
       <Form onSubmit={registerStore}>
         <div style={{ margin: 10, display: "flex" }}>
           <div style={{ width: "50%", margin: 10 }}>

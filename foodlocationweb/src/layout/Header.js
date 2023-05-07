@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import API, { authAPI, endpoints } from "../configs/API";
 import { Button, Container, Form, Nav, Navbar } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../configs/MyContext";
 
 import * as React from "react";
@@ -33,10 +33,12 @@ import Moment from "react-moment";
 import { numberWithCommas } from "../utils/converters";
 
 const Header = () => {
-  const [tags, setTags] = useState([]);
-
-  const [user, dispatch] = useContext(UserContext);
-  const [order, setOrder] = useState([]);
+    
+    const [user, dispatch] = useContext(UserContext)
+    const [name, setName] = useState()
+    const [price, setPrice] = useState()
+    const nav = useNavigate()
+    const [order, setOrder] = useState([]);
 
   useEffect(() => {
     const timmerId = setInterval(() => {
@@ -86,21 +88,25 @@ const Header = () => {
     setAnchorE2(null);
   };
 
-  useEffect(() => {
-    const loadTags = async () => {
-      let res = await API.get(endpoints["tags"]);
-      console.log(res.data.results);
-      setTags(res.data.results);
-    };
+  
 
-    loadTags();
-  }, []);
+  const search = (evt) => {
+        evt.preventDefault()
+        if (name)
+          nav(`/food/?name=${name}`)
+          
+        if (price)
+          nav(`/food/?price=${price}`)
+
+        // if (tags)
+        //   nav(`/food/?tags=${tags}`) 
+    }
 
   const logout = () => {
-    dispatch({
-      type: "logout",
-    });
-  };
+        dispatch({
+            "type": "logout"
+        })
+    }
 
   let userInfo = (
     <>
@@ -392,35 +398,45 @@ const Header = () => {
       </>
     );
 
-  return (
-    <>
-      <Navbar bg="light" expand="lg">
-        <Container>
-          <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto" style={{ alignItems: "center" }}>
-              <Link to="/" style={{ textDecoration: "none", fontSize: "16px" }}>
-                <HomeIcon fontSize="small"></HomeIcon> Trang chủ
-              </Link>
-              {/* {tags.map(t => <Nav.Link href="#link">{t.name}</Nav.Link>)} */}
+    return (
+        <>
+        <Navbar bg="light" expand="lg">
+            <Container>
+                <Navbar.Brand href="#home">Địa Điểm Ăn Uống</Navbar.Brand>
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                <Navbar.Collapse id="basic-navbar-nav">
+                <Nav className="me-auto" style={{ alignItems: "center" }}>
+                    <Link to="/" className="nav-link active">&#127968; Trang chủ</Link>
+                    
+                    {/* {tags.map(t => <Nav.Link href="#link">{t.name}</Nav.Link>)} */}
 
-              {userInfo}
-            </Nav>
-            <Form className="d-flex">
-              <Form.Control
-                type="search"
-                placeholder="Tìm kiếm..."
-                className="me-2"
-                aria-label="Search"
-              />
-              <Button variant="outline-success">Tìm</Button>
-            </Form>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-    </>
-  );
-};
+                    {userInfo}
+                    
+                </Nav>
+                <Form onSubmit={search} className="d-flex">
+                  <Form.Control
+                    type="search"
+                    placeholder="Tìm kiếm theo tên món ăn..."
+                    className="me-2"
+                    aria-label="Search"
+                    value={name}
+                    onChange={evt => setName(evt.target.value)}
+                  />
+                  <Form.Control
+                    type="search"
+                    placeholder="Tìm kiếm theo giá món ăn..."
+                    className="me-2"
+                    aria-label="Search"
+                    value={price}
+                    onChange={evt => setPrice(evt.target.value)}
+                  />
+                  <Button type="submit" variant="outline-success">Tìm</Button>
+                </Form>
+                </Navbar.Collapse>
+            </Container>
+        </Navbar>
+        </>
+    )
+}
 
-export default Header;
+export default Header

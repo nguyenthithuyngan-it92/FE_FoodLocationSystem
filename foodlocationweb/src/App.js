@@ -9,6 +9,7 @@ import Footer from "./layout/Footer";
 import Header from "./layout/Header";
 import userReducer from "./reducers/UserReducer";
 import Foods from "./components/Foods";
+import Home from "./components/Home";
 import RegisterUser from "./components/RegisterUser";
 import RegisterStore from "./components/RegiterStore";
 import StoreManagement from "./components/StoreManagement";
@@ -17,6 +18,9 @@ import CartOrder from "./components/CartOrder";
 import ProfileUser from "./components/ProfileUser";
 import FoodDetail from "./components/FoodDetail";
 import StoreFeedback from "./components/StoreFeedback";
+import RevenueStatsYear from "./components/StatsYear";
+import RevenueStatsMonth from "./components/StatsMonth";
+import RevenueStatsQuarter from "./components/StatsQuarter";
 
 import "moment/locale/vi";
 import moment from "moment";
@@ -41,7 +45,8 @@ function App() {
 
         <Container>
           <Routes>
-            <Route path="/" element={<Foods />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/food" element={<Foods />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<RegisterUser />} />
             <Route path="/register-store" element={<RegisterStore />} />
@@ -54,6 +59,9 @@ function App() {
             <Route path="/cart" element={<CartOrder />} />
             <Route path="/foods/:foodId/" element={<FoodDetail />} />
             <Route path="/stores/:storeId/" element={<StoreFeedback />} />
+            <Route path="/revenue-stats-month/" element={<RevenueStatsMonth />} />
+            <Route path="/revenue-stats-quarter/" element={<RevenueStatsQuarter />} />
+            <Route path="/revenue-stats-year/" element={<RevenueStatsYear />} />
             <Route path="*" element={<h1>Comming soon...</h1>}></Route>
           </Routes>
         </Container>

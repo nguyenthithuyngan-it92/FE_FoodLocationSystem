@@ -21,7 +21,7 @@ export default function CustomizedBadges({ count = 0 }) {
 
   return (
     <>
-      {user && user.user_role == 0 ? (
+      {user && user.user_role === 0 ? (
         <div
           style={{
             position: "fixed",
